@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selarón — Entrar</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+
+    .card { background: white; border-radius: 16px; padding: 36px 28px; max-width: 380px; width: 100%; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo div { font-size: 40px; margin-bottom: 8px; }
+    .logo h1 { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+    .logo p { font-size: 14px; color: #aaa; margin-top: 4px; }
+
+    label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+    input { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 12px 14px; font-size: 15px; outline: none; margin-bottom: 14px; transition: border-color 0.2s; }
+    input:focus { border-color: #e63946; }
+
+    .btn-entrar { width: 100%; background: #e63946; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-entrar:hover { background: #c1121f; }
+    .btn-entrar:disabled { background: #ccc; cursor: not-allowed; }
+
+    .erro { color: #e63946; font-size: 13px; margin-top: 10px; text-align: center; display: none; }
+    .rodape { text-align: center; margin-top: 24px; font-size: 12px; color: #ccc; }
+
+    .menu { display: none; }
+    .menu h2 { font-size: 16px; color: #444; margin-bottom: 16px; text-align: center; }
+    .opcao { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1.5px solid #e0e0e0; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; text-decoration: none; color: inherit; }
+    .opcao:hover { border-color: #e63946; background: #fff5f5; }
+    .opcao-icone { font-size: 24px; }
+    .opcao-titulo { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+    .opcao-desc { font-size: 12px; color: #aaa; margin-top: 2px; }
+    .btn-sair-menu { width: 100%; background: none; border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px; font-size: 14px; color: #888; cursor: pointer; margin-top: 6px; }
+    .btn-sair-menu:hover { border-color: #ccc; color: #555; }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">
+    <div>🎨</div>
+    <h1>Selarón Azulejos</h1>
+    <p id="logo-sub">Faça login para continuar</p>
+  </div>
+
+  <div id="tela-login">
+    <label>Nome</label>
+    <input type="text" id="nome" placeholder="Seu nome" autocomplete="off">
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="Sua senha">
+    <button class="btn-entrar" id="btn-entrar" onclick="fazerLogin()">Entrar</button>
+    <div class="erro" id="erro"></div>
+    <div class="rodape">Selarón Azulejos · Sistema interno</div>
+  </div>
+
+  <div class="menu" id="tela-menu">
+    <h2>O que deseja acessar?</h2>
+    <a class="opcao" id="opcao-vendas" href="/vendedor.html">
+      <span class="opcao-icone">📷</span>
+      <div>
+        <div class="opcao-titulo">Fazer vendas</div>
+        <div class="opcao-desc">Tirar foto e enviar pedido</div>
+      </div>
+    </a>
+    <a class="opcao" id="opcao-producao" href="/producao.html">
+      <span class="opcao-icone">🏭</span>
+      <div>
+        <div class="opcao-titulo">Produção</div>
+        <div class="opcao-desc">Painel de pedidos e timer</div>
+      </div>
+    </a>
+    <a class="opcao" id="opcao-gestao" href="/gestao.html">
+      <span class="opcao-icone">📊</span>
+      <div>
+        <div class="opcao-titulo">Gestão</div>
+        <div class="opcao-desc">Relatórios e usuários</div>
+      </div>
+    </a>
+    <button class="btn-sair-menu" onclick="sair()">Sair</button>
+  </div>
+</div>
+
+<script>
+  // verifica token salvo
+  const tokenSalvo = localStorage.getItem('selaron_token')
+  const usuarioSalvo = localStorage.getItem('selaron_usuario')
+  if (tokenSalvo && usuarioSalvo) {
+    mostrarMenu(JSON.parse(usuarioSalvo))
+  }
+
+  async function fazerLogin() {
+    const nome = document.getElementById('nome').value.trim()
+    const senha = document.getElementById('senha').value.trim()
+    if (!nome || !senha) return
+
+    const btn = document.getElementById('btn-entrar')
+    const erro = document.getElementById('erro')
+    btn.disabled = true
+    btn.textContent = 'Entrando...'
+    erro.style.display = 'none'
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome, senha })
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        erro.textContent = data.erro || 'Nome ou senha incorretos'
+        erro.style.display = 'block'
+        btn.disabled = false
+        btn.textContent = 'Entrar'
+        return
+      }
+
+      localStorage.setItem('selaron_token', data.token)
+      localStorage.setItem('selaron_usuario', JSON.stringify(data.usuario))
+      mostrarMenu(data.usuario)
+
+    } catch (e) {
+      erro.textContent = 'Erro de conexão com o servidor'
+      erro.style.display = 'block'
+      btn.disabled = false
+      btn.textContent = 'Entrar'
+    }
+  }
+
+  function mostrarMenu(usuario) {
+    // se tiver só uma permissão, redireciona direto
+    const permissoes = [usuario.pode_vender, usuario.pode_producao, usuario.pode_gestao].filter(Boolean)
+    if (permissoes.length === 1) {
+      if (usuario.pode_vender) return window.location.href = '/vendedor.html'
+      if (usuario.pode_producao) return window.location.href = '/producao.html'
+      if (usuario.pode_gestao) return window.location.href = '/gestao.html'
+    }
+
+    // mais de uma permissão — mostra menu
+    document.getElementById('tela-login').style.display = 'none'
+    document.getElementById('tela-menu').style.display = 'block'
+    document.getElementById('logo-sub').textContent = 'Olá, ' + usuario.nome
+    document.getElementById('opcao-vendas').style.display = usuario.pode_vender ? 'flex' : 'none'
+    document.getElementById('opcao-producao').style.display = usuario.pode_producao ? 'flex' : 'none'
+    document.getElementById('opcao-gestao').style.display = usuario.pode_gestao ? 'flex' : 'none'
+  }
+
+  function sair() {
+    localStorage.removeItem('selaron_token')
+    localStorage.removeItem('selaron_usuario')
+    document.getElementById('tela-menu').style.display = 'none'
+    document.getElementById('tela-login').style.display = 'block'
+    document.getElementById('logo-sub').textContent = 'Faça login para continuar'
+    document.getElementById('nome').value = ''
+    document.getElementById('senha').value = ''
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') fazerLogin()
+  })
+</script>
+</body>
+</html>
