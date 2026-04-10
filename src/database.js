@@ -1,9 +1,9 @@
-const Database = require('better-sqlite3')
-const bcrypt = require('bcrypt')
-const path = require('path')
-const { v4: uuidv4 } = require('uuid')
+const Database = require("better-sqlite3");
+const bcrypt = require("bcrypt");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
-const db = new Database(path.join(__dirname, '..', 'selaron.db'))
+const db = new Database(path.join(__dirname, "..", "selaron.db"));
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS usuarios (
@@ -32,24 +32,32 @@ db.exec(`
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP
   );
-`)
+`);
 
 // cria usuários iniciais se não existirem
-const existe = db.prepare('SELECT id FROM usuarios LIMIT 1').get()
+const existe = db.prepare("SELECT id FROM usuarios LIMIT 1").get();
 if (!existe) {
   const usuarios = [
-    { nome: 'Vendedor Teste', senha: '1234',    vender: 1, producao: 0, gestao: 0 },
-    { nome: 'Producao',       senha: 'prod2024', vender: 0, producao: 1, gestao: 0 },
-    { nome: 'Dono',           senha: 'dono2024', vender: 1, producao: 1, gestao: 1 },
-  ]
+    {
+      nome: "Vendedor Teste",
+      senha: "1234",
+      vender: 1,
+      producao: 0,
+      gestao: 0,
+    },
+    { nome: "Producao", senha: "prod2024", vender: 0, producao: 1, gestao: 0 },
+    { nome: "Dono", senha: "dono2024", vender: 1, producao: 1, gestao: 1 },
+  ];
   for (const u of usuarios) {
-    const hash = bcrypt.hashSync(u.senha, 10)
-    db.prepare(`
+    const hash = bcrypt.hashSync(u.senha, 10);
+    db.prepare(
+      `
       INSERT INTO usuarios (id, nome, senha_hash, pode_vender, pode_producao, pode_gestao)
       VALUES (?, ?, ?, ?, ?, ?)
-    `).run(uuidv4(), u.nome, hash, u.vender, u.producao, u.gestao)
+    `,
+    ).run(uuidv4(), u.nome, hash, u.vender, u.producao, u.gestao);
   }
-  console.log('Usuários iniciais criados')
+  console.log("Usuários iniciais criados");
 }
 
-module.exports = db
+module.exports = db;

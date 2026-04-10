@@ -1,182 +1,187 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Selarón — Meu pedido</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selarón — Meu pedido</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
 
-    .card { background: white; border-radius: 16px; padding: 28px 24px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+      .card { background: white; border-radius: 16px; padding: 28px 24px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
 
-    .logo { font-size: 36px; margin-bottom: 8px; }
-    .titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
-    .subtitulo { font-size: 13px; color: #aaa; margin-bottom: 24px; }
+      .logo { font-size: 36px; margin-bottom: 8px; }
+      .titulo { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+      .subtitulo { font-size: 13px; color: #aaa; margin-bottom: 24px; }
 
-    .numero-grande { font-size: 38px; font-weight: 700; letter-spacing: 4px; color: #1a1a2e; margin-bottom: 20px; }
+      .numero-grande { font-size: 38px; font-weight: 700; letter-spacing: 4px; color: #1a1a2e; margin-bottom: 20px; }
 
-    .status-box { border-radius: 12px; padding: 18px; margin-bottom: 16px; }
-    .status-box.aguardando { background: #fff8e6; }
-    .status-box.pronto { background: #eafaf0; }
-    .status-box.erro { background: #fff0f0; }
-    .status-icone { font-size: 36px; margin-bottom: 6px; }
-    .status-texto { font-size: 17px; font-weight: 600; }
-    .status-box.aguardando .status-texto { color: #d4890a; }
-    .status-box.pronto .status-texto { color: #1a8a3c; }
-    .status-box.erro .status-texto { color: #c62828; }
-    .status-detalhe { font-size: 13px; color: #888; margin-top: 4px; }
+      .status-box { border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+      .status-box.aguardando { background: #fff8e6; }
+      .status-box.pronto { background: #eafaf0; }
+      .status-box.erro { background: #fff0f0; }
+      .status-icone { font-size: 36px; margin-bottom: 6px; }
+      .status-texto { font-size: 17px; font-weight: 600; }
+      .status-box.aguardando .status-texto { color: #d4890a; }
+      .status-box.pronto .status-texto { color: #1a8a3c; }
+      .status-box.erro .status-texto { color: #c62828; }
+      .status-detalhe { font-size: 13px; color: #888; margin-top: 4px; }
 
-    .foto-preview { width: 100%; border-radius: 10px; margin-bottom: 16px; display: none; cursor: pointer; transition: opacity 0.2s; }
-    .foto-preview:hover { opacity: 0.9; }
+      .foto-preview { width: 100%; border-radius: 10px; margin-bottom: 16px; display: none; cursor: pointer; transition: opacity 0.2s; }
+      .foto-preview:hover { opacity: 0.9; }
 
-    .info { font-size: 13px; color: #888; margin-bottom: 6px; }
-    .info strong { color: #444; }
+      .info { font-size: 13px; color: #888; margin-bottom: 6px; }
+      .info strong { color: #444; }
 
-    .btn-download { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; margin-top: 16px; transition: background 0.2s; }
-    .btn-download:hover { background: #2d2d4e; }
-    .btn-download svg { flex-shrink: 0; }
+      .btn-download { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600; cursor: pointer; text-decoration: none; margin-top: 16px; transition: background 0.2s; }
+      .btn-download:hover { background: #2d2d4e; }
+      .btn-download svg { flex-shrink: 0; }
 
-    .divisor { border: none; border-top: 1px solid #f0f0f0; margin: 20px 0; }
+      .divisor { border: none; border-top: 1px solid #f0f0f0; margin: 20px 0; }
 
-    .buscar { display: flex; gap: 8px; margin-top: 20px; }
-    .buscar input { flex: 1; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; text-transform: uppercase; }
-    .buscar input:focus { border-color: #e63946; }
-    .buscar button { background: #e63946; color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
+      .buscar { display: flex; gap: 8px; margin-top: 20px; }
+      .buscar input { flex: 1; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; text-transform: uppercase; }
+      .buscar input:focus { border-color: #e63946; }
+      .buscar button { background: #e63946; color: white; border: none; border-radius: 8px; padding: 10px 16px; font-size: 14px; font-weight: 600; cursor: pointer; }
 
-    .loading { color: #aaa; font-size: 14px; padding: 20px 0; }
+      .loading { color: #aaa; font-size: 14px; padding: 20px 0; }
 
-    .atualiza { font-size: 11px; color: #ccc; margin-top: 12px; }
-  </style>
-</head>
-<body>
-<div class="card">
-  <div class="logo">🎨</div>
-  <div class="titulo">Selarón Azulejos</div>
-  <div class="subtitulo">Acompanhe seu pedido</div>
+      .atualiza { font-size: 11px; color: #ccc; margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="logo">🎨</div>
+      <div class="titulo">Selarón Azulejos</div>
+      <div class="subtitulo">Acompanhe seu pedido</div>
 
-  <div id="conteudo">
-    <div class="loading">Buscando seu pedido...</div>
-  </div>
-
-  <div class="buscar">
-    <input type="text" id="input-numero" placeholder="Código ex: ABC123" maxlength="6">
-    <button onclick="buscar()">Buscar</button>
-  </div>
-</div>
-
-<script>
-  const params = new URLSearchParams(window.location.search)
-  const numeroUrl = params.get('pedido')
-  let codigoAtual = null
-  let intervaloStatus = null
-
-  function renderizar(pedido) {
-    codigoAtual = pedido.numero
-    const criado = new Date(pedido.criado_em + 'Z')
-    const horario = criado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    const isProto = pedido.status === 'pronto'
-
-    document.getElementById('conteudo').innerHTML = `
-      <div class="numero-grande">${pedido.numero}</div>
-
-      <img
-        id="foto-pedido"
-        class="foto-preview"
-        src="/uploads/${pedido.foto}"
-        alt="Sua foto"
-        onclick="baixarFoto()"
-        title="Toque para baixar"
-      >
-
-      <div class="status-box ${isProto ? 'pronto' : 'aguardando'}">
-        <div class="status-icone">${isProto ? '✅' : '⏳'}</div>
-        <div class="status-texto">${isProto ? 'Pronto para retirar!' : 'Em produção...'}</div>
-        <div class="status-detalhe">${isProto
-          ? 'Seu azulejo está pronto. Retire com o vendedor.'
-          : 'Aguarde, estamos fazendo seu azulejo com carinho.'
-        }</div>
+      <div id="conteudo">
+        <div class="loading">Buscando seu pedido...</div>
       </div>
 
-      <p class="info">Tamanho: <strong>${pedido.tamanho}</strong></p>
-      <p class="info">Pedido às <strong>${horario}</strong></p>
-
-      <hr class="divisor">
-
-      <a class="btn-download" onclick="baixarFoto()" href="javascript:void(0)">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/>
-          <line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Baixar minha foto
-      </a>
-
-      ${!isProto ? `<div class="atualiza">Atualizando automaticamente a cada 10 segundos</div>` : ''}
-    `
-
-    // mostra a foto
-    const imgEl = document.getElementById('foto-pedido')
-    if (imgEl) {
-      imgEl.style.display = 'block'
-      imgEl.onerror = () => imgEl.style.display = 'none'
-    }
-
-    // continua verificando enquanto aguardando
-    if (!isProto) {
-      clearInterval(intervaloStatus)
-      intervaloStatus = setInterval(() => buscar(codigoAtual, true), 10000)
-    } else {
-      clearInterval(intervaloStatus)
-    }
-  }
-
-  function renderizarErro() {
-    clearInterval(intervaloStatus)
-    document.getElementById('conteudo').innerHTML = `
-      <div class="status-box erro">
-        <div class="status-icone">❌</div>
-        <div class="status-texto">Pedido não encontrado</div>
-        <div class="status-detalhe">Verifique o código e tente novamente</div>
+      <div class="buscar">
+        <input
+          type="text"
+          id="input-numero"
+          placeholder="Código ex: ABC123"
+          maxlength="6"
+        />
+        <button onclick="buscar()">Buscar</button>
       </div>
-    `
-  }
+    </div>
 
-  function baixarFoto() {
-    if (!codigoAtual) return
-    const link = document.createElement('a')
-    link.href = `/api/foto/${codigoAtual}`
-    link.download = `selaron-${codigoAtual}.jpg`
-    link.click()
-  }
+    <script>
+      const params = new URLSearchParams(window.location.search)
+      const numeroUrl = params.get('pedido')
+      let codigoAtual = null
+      let intervaloStatus = null
 
-  async function buscar(numero, silencioso = false) {
-    const cod = (numero || document.getElementById('input-numero').value).trim().toUpperCase()
-    if (cod.length < 6) return
+      function renderizar(pedido) {
+        codigoAtual = pedido.numero
+        const criado = new Date(pedido.criado_em + 'Z')
+        const horario = criado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+        const isProto = pedido.status === 'pronto'
 
-    if (!silencioso) {
-      document.getElementById('conteudo').innerHTML = '<div class="loading">Buscando...</div>'
-    }
+        document.getElementById('conteudo').innerHTML = `
+          <div class="numero-grande">${pedido.numero}</div>
 
-    try {
-      const res = await fetch(`/api/rastrear/${cod}`)
-      if (!res.ok) return renderizarErro()
-      const pedido = await res.json()
-      renderizar(pedido)
-    } catch (e) {
-      renderizarErro()
-    }
-  }
+          <img
+            id="foto-pedido"
+            class="foto-preview"
+            src="/uploads/${pedido.foto}"
+            alt="Sua foto"
+            onclick="baixarFoto()"
+            title="Toque para baixar"
+          >
 
-  if (numeroUrl) {
-    buscar(numeroUrl)
-  } else {
-    document.getElementById('conteudo').innerHTML = '<p style="color:#aaa;font-size:14px;padding:16px 0">Digite o código do seu pedido abaixo</p>'
-  }
+          <div class="status-box ${isProto ? 'pronto' : 'aguardando'}">
+            <div class="status-icone">${isProto ? '✅' : '⏳'}</div>
+            <div class="status-texto">${isProto ? 'Pronto para retirar!' : 'Em produção...'}</div>
+            <div class="status-detalhe">${isProto
+              ? 'Seu azulejo está pronto. Retire com o vendedor.'
+              : 'Aguarde, estamos fazendo seu azulejo com carinho.'
+            }</div>
+          </div>
 
-  document.getElementById('input-numero').addEventListener('keydown', e => {
-    if (e.key === 'Enter') buscar()
-  })
-</script>
-</body>
+          <p class="info">Tamanho: <strong>${pedido.tamanho}</strong></p>
+          <p class="info">Pedido às <strong>${horario}</strong></p>
+
+          <hr class="divisor">
+
+          <a class="btn-download" onclick="baixarFoto()" href="javascript:void(0)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Baixar minha foto
+          </a>
+
+          ${!isProto ? `<div class="atualiza">Atualizando automaticamente a cada 10 segundos</div>` : ''}
+        `
+
+        // mostra a foto
+        const imgEl = document.getElementById('foto-pedido')
+        if (imgEl) {
+          imgEl.style.display = 'block'
+          imgEl.onerror = () => imgEl.style.display = 'none'
+        }
+
+        // continua verificando enquanto aguardando
+        if (!isProto) {
+          clearInterval(intervaloStatus)
+          intervaloStatus = setInterval(() => buscar(codigoAtual, true), 10000)
+        } else {
+          clearInterval(intervaloStatus)
+        }
+      }
+
+      function renderizarErro() {
+        clearInterval(intervaloStatus)
+        document.getElementById('conteudo').innerHTML = `
+          <div class="status-box erro">
+            <div class="status-icone">❌</div>
+            <div class="status-texto">Pedido não encontrado</div>
+            <div class="status-detalhe">Verifique o código e tente novamente</div>
+          </div>
+        `
+      }
+
+      function baixarFoto() {
+        if (!codigoAtual) return
+        const link = document.createElement('a')
+        link.href = `/api/foto/${codigoAtual}`
+        link.download = `selaron-${codigoAtual}.jpg`
+        link.click()
+      }
+
+      async function buscar(numero, silencioso = false) {
+        const cod = (numero || document.getElementById('input-numero').value).trim().toUpperCase()
+        if (cod.length < 6) return
+
+        if (!silencioso) {
+          document.getElementById('conteudo').innerHTML = '<div class="loading">Buscando...</div>'
+        }
+
+        try {
+          const res = await fetch(`/api/rastrear/${cod}`)
+          if (!res.ok) return renderizarErro()
+          const pedido = await res.json()
+          renderizar(pedido)
+        } catch (e) {
+          renderizarErro()
+        }
+      }
+
+      if (numeroUrl) {
+        buscar(numeroUrl)
+      } else {
+        document.getElementById('conteudo').innerHTML = '<p style="color:#aaa;font-size:14px;padding:16px 0">Digite o código do seu pedido abaixo</p>'
+      }
+
+      document.getElementById('input-numero').addEventListener('keydown', e => {
+        if (e.key === 'Enter') buscar()
+      })
+    </script>
+  </body>
 </html>

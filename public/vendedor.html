@@ -71,18 +71,26 @@
 
       <div class="card">
         <h2>Foto do cliente</h2>
-        <div class="foto-area" onclick="document.getElementById('input-foto').click()">
-          <div class="placeholder">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
-            Toque para tirar foto
-          </div>
-          <img id="preview-foto" src="" alt="" style="display:none">
-        </div>
-        <input type="file" id="input-foto" accept="image/*" capture="environment" onchange="mostrarPreview(this)">
-      </div>
+      <div class="foto-area" id="foto-area">
+  <div class="placeholder" id="placeholder">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+    <div style="display:flex; gap:10px; margin-top:8px;">
+      <button onclick="event.stopPropagation(); abrirCamera()" style="background:#e63946; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;">
+        Câmera
+      </button>
+      <button onclick="event.stopPropagation(); abrirGaleria()" style="background:#1a1a2e; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;">
+        Galeria
+      </button>
+    </div>
+  </div>
+  <img id="preview-foto" src="" alt="" style="display:none">
+</div>
+
+<input type="file" id="input-camera" accept="image/*" capture="environment" onchange="mostrarPreview(this)" style="display:none">
+<input type="file" id="input-galeria" accept="image/*" onchange="mostrarPreview(this)" style="display:none">
 
       <div class="card">
         <h2>Ponto de venda</h2>
@@ -161,15 +169,15 @@
     document.getElementById('ponto-baixo').classList.toggle('selecionado', ponto === 'baixo')
   }
 
-  function mostrarPreview(input) {
-    if (!input.files[0]) return
-    fotoSelecionada = input.files[0]
-    const url = URL.createObjectURL(fotoSelecionada)
-    const img = document.getElementById('preview-foto')
-    img.src = url
-    img.style.display = 'block'
-    document.querySelector('.placeholder').style.display = 'none'
-  }
+function mostrarPreview(input) {
+  if (!input.files[0]) return
+  fotoSelecionada = input.files[0]
+  const url = URL.createObjectURL(fotoSelecionada)
+  const img = document.getElementById('preview-foto')
+  img.src = url
+  img.style.display = 'block'
+  document.getElementById('placeholder').style.display = 'none'
+}
 
   async function enviarPedido() {
     if (!fotoSelecionada) return alert('Tire uma foto primeiro')
@@ -205,10 +213,11 @@
     tamanhoSelecionado = null
     pontoSelecionado = 'cima'
     document.getElementById('preview-foto').style.display = 'none'
-    document.getElementById('preview-foto').src = ''
-    document.querySelector('.placeholder').style.display = 'flex'
-    document.getElementById('input-foto').value = ''
-    document.getElementById('nome-cliente').value = ''
+document.getElementById('preview-foto').src = ''
+document.getElementById('placeholder').style.display = 'flex'
+document.getElementById('input-camera').value = ''
+document.getElementById('input-galeria').value = ''  
+    document.getElementById('nome-cliente').value = ''    
     document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
     selecionarPonto('cima')
     document.getElementById('tela-sucesso').style.display = 'none'
@@ -216,6 +225,14 @@
     document.getElementById('btn-enviar').disabled = false
     document.getElementById('btn-enviar').textContent = 'Enviar pedido para produção'
   }
+
+  function abrirCamera() {
+  document.getElementById('input-camera').click()
+}
+
+function abrirGaleria() {
+  document.getElementById('input-galeria').click()
+}
 </script>
 </body>
-</html>
+</html>  
