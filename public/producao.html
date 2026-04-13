@@ -11,39 +11,59 @@
 
       .topo { background: #1a1a2e; color: white; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; }
       .topo h1 { font-size: 17px; font-weight: 600; }
-      .topo-direita { display: flex; align-items: center; gap: 12px; }
-      .btn-som { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
-      .btn-som:hover { background: rgba(255,255,255,0.1); }
-      .btn-sair { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
-      .btn-sair:hover { background: rgba(255,255,255,0.15); }
-      .contador { background: #e63946; border-radius: 20px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+      .topo-direita { display: flex; align-items: center; gap: 10px; }
+      .btn-topo { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+      .btn-topo:hover { background: rgba(255,255,255,0.1); }
 
-      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 20px; }
+      .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 20px; min-height: calc(100vh - 56px); align-items: start; }
 
-      .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-      .card.urgente { border: 2px solid #e63946; }
-      .card.quase { border: 2px solid #f4a261; }
+      .coluna { background: #e8e8e8; border-radius: 12px; padding: 12px; }
+      .coluna-titulo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px; }
+      .coluna-titulo h2 { font-size: 14px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+      .coluna-badge { border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+      .badge-novo { background: #e63946; color: white; }
+      .badge-producao { background: #f4a261; color: white; }
+      .badge-pronto { background: #2dc653; color: white; }
 
-      .card-foto { width: 100%; height: 200px; object-fit: cover; display: block; }
-      .card-corpo { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-      .card-topo { display: flex; justify-content: space-between; align-items: center; }
-      .numero { font-size: 22px; font-weight: 700; color: #1a1a2e; letter-spacing: 2px; }
-      .timer { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 10px; }
+      .card:last-child { margin-bottom: 0; }
+      .card.urgente { border-left: 4px solid #e63946; }
+      .card.quase { border-left: 4px solid #f4a261; }
+      .card.finalizado { opacity: 0.75; }
+
+      .card-foto-wrap { position: relative; }
+      .card-foto { width: 100%; height: 160px; object-fit: cover; display: block; }
+      .salvar-foto { position: absolute; bottom:8px; right:8px; background:rgba(0,0,0,0.6); color:white; border-radius:6px; padding:5px 8px; font-size:11px; text-decoration:none; font-weight:600; }
+
+      .card-corpo { padding: 12px; }
+      .card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      .numero { font-size: 18px; font-weight: 700; color: #1a1a2e; letter-spacing: 2px; }
+      .timer { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
       .timer.ok { color: #2dc653; }
       .timer.quase { color: #f4a261; }
       .timer.urgente { color: #e63946; }
+      .timer.pausado { color: #aaa; font-size: 13px; }
 
-      .info-linha { display: flex; gap: 8px; flex-wrap: wrap; }
-      .badge { background: #f0f0f0; border-radius: 6px; padding: 4px 10px; font-size: 12px; color: #555; }
+      .info-linha { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+      .badge { background: #f0f0f0; border-radius: 6px; padding: 3px 8px; font-size: 11px; color: #555; }
       .badge.ponto { background: #e8f4fd; color: #1a6fa8; }
-      .nome-cliente { font-size: 13px; color: #888; }
+      .nome-cliente { font-size: 12px; color: #888; }
 
-      .btn-pronto { width: 100%; background: #2dc653; color: white; border: none; border-radius: 8px; padding: 13px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: auto; transition: background 0.2s; }
+      .card-acoes { display: flex; gap: 8px; }
+      .btn-acao { flex: 1; border: none; border-radius: 8px; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+      .btn-iniciar { background: #f4a261; color: white; }
+      .btn-iniciar:hover { background: #e08c4a; }
+      .btn-pronto { background: #2dc653; color: white; }
       .btn-pronto:hover { background: #25a244; }
+      .btn-acao:disabled { background: #ccc; cursor: not-allowed; }
 
-      .vazio { text-align: center; padding: 80px 20px; color: #aaa; }
-      .vazio svg { opacity: 0.3; margin-bottom: 12px; }
-      .vazio p { font-size: 16px; }
+      .hora-finalizacao { font-size: 11px; color: #aaa; text-align: center; margin-top: 6px; }
+
+      .coluna-vazia { text-align: center; padding: 40px 20px; color: #bbb; font-size: 13px; }
+
+      @media (max-width: 700px) {
+        .kanban { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
   <body>
@@ -51,24 +71,49 @@
       <div class="topo">
         <h1>Painel da produção</h1>
         <div class="topo-direita">
-          <button class="btn-som" id="btn-som" onclick="toggleSom()">
+          <button class="btn-topo" id="btn-som" onclick="toggleSom()">
             Som: OFF
           </button>
-          <span class="contador" id="contador">0 pedidos</span>
-          <button class="btn-sair" onclick="voltarMenu()">Menu</button>
-          <button class="btn-sair" onclick="sair()">Sair</button>
+          <button class="btn-topo" onclick="voltarMenu()">Menu</button>
+          <button class="btn-topo" onclick="sair()">Sair</button>
         </div>
       </div>
-      <div id="lista" class="grid"></div>
+
+      <div class="kanban">
+        <div class="coluna">
+          <div class="coluna-titulo">
+            <h2>Novo pedido</h2>
+            <span class="coluna-badge badge-novo" id="badge-novo">0</span>
+          </div>
+          <div id="col-novo"></div>
+        </div>
+
+        <div class="coluna">
+          <div class="coluna-titulo">
+            <h2>Em produção</h2>
+            <span class="coluna-badge badge-producao" id="badge-producao"
+              >0</span
+            >
+          </div>
+          <div id="col-producao"></div>
+        </div>
+
+        <div class="coluna">
+          <div class="coluna-titulo">
+            <h2>Pronto hoje</h2>
+            <span class="coluna-badge badge-pronto" id="badge-pronto">0</span>
+          </div>
+          <div id="col-pronto"></div>
+        </div>
+      </div>
     </div>
 
     <script>
-      let pedidosAtuais = {}
+      let pedidos = {}
       let timers = {}
       let somAtivo = false
       let audioCtx = null
       let idsAnteriores = new Set()
-      let intervaloPedidos = null
       let usuarioLogado = null
 
       usuarioLogado = getUsuario()
@@ -76,15 +121,13 @@
         window.location.href = '/login.html'
       } else {
         carregarPedidos()
-        intervaloPedidos = setInterval(carregarPedidos, 5000)
+        setInterval(carregarPedidos, 5000)
       }
 
       function toggleSom() {
         somAtivo = !somAtivo
         document.getElementById('btn-som').textContent = 'Som: ' + (somAtivo ? 'ON' : 'OFF')
-        if (somAtivo && !audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-        }
+        if (somAtivo && !audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)()
       }
 
       function tocarSom() {
@@ -104,55 +147,101 @@
 
       async function carregarPedidos() {
         try {
-          const res = await fetchAuth('/api/pedidos')
-          const pedidos = await res.json()
-          const ids = pedidos.map(p => p.id)
+          const res = await fetchAuth('/api/pedidos/kanban')
+          const data = await res.json()
 
-          Object.keys(pedidosAtuais).forEach(id => {
-            if (!ids.includes(id)) {
-              const el = document.getElementById('card-' + id)
-              if (el) el.remove()
+          const todosIds = [...data.novos, ...data.emProducao, ...data.prontos].map(p => p.id)
+
+          // detecta novos
+          let temNovo = false
+          data.novos.forEach(p => {
+            if (!idsAnteriores.has(p.id) && idsAnteriores.size > 0) temNovo = true
+          })
+          if (temNovo) tocarSom()
+          idsAnteriores = new Set(todosIds)
+
+          // para timers de pedidos que saíram
+          Object.keys(timers).forEach(id => {
+            if (!todosIds.includes(id)) {
               clearInterval(timers[id])
               delete timers[id]
-              delete pedidosAtuais[id]
             }
           })
 
-          let temNovo = false
-          pedidos.forEach(p => {
-            if (!pedidosAtuais[p.id]) {
-              if (idsAnteriores.size > 0) temNovo = true
-              pedidosAtuais[p.id] = p
-              adicionarCard(p)
-            }
-          })
+          renderColuna('col-novo', data.novos, 'novo')
+          renderColuna('col-producao', data.emProducao, 'producao')
+          renderColuna('col-pronto', data.prontos, 'pronto')
 
-          if (temNovo) tocarSom()
-          idsAnteriores = new Set(ids)
-          atualizarContador()
-          mostrarVazio(pedidos.length === 0)
+          document.getElementById('badge-novo').textContent = data.novos.length
+          document.getElementById('badge-producao').textContent = data.emProducao.length
+          document.getElementById('badge-pronto').textContent = data.prontos.length
+
         } catch (e) {
           console.error('Erro ao carregar pedidos', e)
         }
       }
 
-      function adicionarCard(p) {
-        const lista = document.getElementById('lista')
+      function renderColuna(colId, lista, tipo) {
+        const col = document.getElementById(colId)
+
+        if (lista.length === 0) {
+          col.innerHTML = '<div class="coluna-vazia">Nenhum pedido</div>'
+          return
+        }
+
+        // mantém cards existentes, adiciona novos, remove ausentes
+        const idsNovos = new Set(lista.map(p => p.id))
+        col.querySelectorAll('.card[data-id]').forEach(el => {
+          if (!idsNovos.has(el.dataset.id)) el.remove()
+        })
+
+        lista.forEach(p => {
+          if (!document.getElementById('card-' + p.id)) {
+            col.appendChild(criarCard(p, tipo))
+            if (tipo !== 'pronto') iniciarTimer(p.id, new Date(p.criado_em + 'Z'))
+          }
+        })
+
+        // garante ordem
+        lista.forEach((p, i) => {
+          const el = document.getElementById('card-' + p.id)
+          if (el && col.children[i] !== el) col.appendChild(el)
+        })
+      }
+
+      function criarCard(p, tipo) {
         const div = document.createElement('div')
-        div.className = 'card'
+        div.className = 'card' + (tipo === 'pronto' ? ' finalizado' : '')
         div.id = 'card-' + p.id
+        div.dataset.id = p.id
+
         const criado = new Date(p.criado_em + 'Z')
+        const finalizado = p.atualizado_em ? new Date(p.atualizado_em + 'Z') : null
+
+        let timerHtml = ''
+        if (tipo === 'novo' || tipo === 'producao') {
+          timerHtml = `<span class="timer ok" id="timer-${p.id}">10:00</span>`
+        } else {
+          const hora = finalizado ? finalizado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''
+          timerHtml = `<span class="timer pausado">Pronto às ${hora}</span>`
+        }
+
+        let acoesHtml = ''
+        if (tipo === 'novo') {
+          acoesHtml = `<button class="btn-acao btn-iniciar" onclick="moverStatus('${p.id}', 'em_producao')">Iniciar produção</button>`
+        } else if (tipo === 'producao') {
+          acoesHtml = `<button class="btn-acao btn-pronto" onclick="moverStatus('${p.id}', 'pronto')">Marcar como pronto</button>`
+        }
+
         div.innerHTML = `
-          <div style="position:relative;">
+          <div class="card-foto-wrap">
             <img class="card-foto" src="/uploads/${p.foto}" alt="Foto do pedido">
-            <a href="/uploads/${p.foto}" download="pedido-${p.numero}.jpg" style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.6);color:white;border-radius:6px;padding:6px 10px;font-size:12px;text-decoration:none;font-weight:600;">
-              Salvar foto
-            </a>
+            <a href="/uploads/${p.foto}" download="pedido-${p.numero}.jpg" class="salvar-foto">Salvar foto</a>
           </div>
           <div class="card-corpo">
             <div class="card-topo">
               <span class="numero">${p.numero}</span>
-              <span class="timer ok" id="timer-${p.id}">10:00</span>
+              ${timerHtml}
             </div>
             <div class="info-linha">
               <span class="badge">${p.tamanho}</span>
@@ -163,14 +252,14 @@
               <span class="badge">${p.vendedor_nome}</span>
               ${p.nome_cliente ? `<span class="nome-cliente">${p.nome_cliente}</span>` : ''}
             </div>
-            <button class="btn-pronto" onclick="marcarPronto('${p.id}')">Marcar como pronto</button>
+            ${acoesHtml ? `<div class="card-acoes">${acoesHtml}</div>` : ''}
           </div>
         `
-        lista.prepend(div)
-        iniciarTimer(p.id, criado)
+        return div
       }
 
       function iniciarTimer(id, criado) {
+        if (timers[id]) return
         const LIMITE = 10 * 60 * 1000
         function atualizar() {
           const el = document.getElementById('timer-' + id)
@@ -181,74 +270,41 @@
           if (restante <= 0) {
             el.textContent = '00:00'
             el.className = 'timer urgente'
-            card.className = 'card urgente'
+            card.classList.add('urgente')
+            card.classList.remove('quase')
             return
           }
           const min = Math.floor(restante / 60000)
           const seg = Math.floor((restante % 60000) / 1000)
           el.textContent = String(min).padStart(2, '0') + ':' + String(seg).padStart(2, '0')
           if (restante < 2 * 60 * 1000) {
-            el.className = 'timer urgente'; card.className = 'card urgente'
+            el.className = 'timer urgente'
+            card.classList.add('urgente'); card.classList.remove('quase')
           } else if (restante < 4 * 60 * 1000) {
-            el.className = 'timer quase'; card.className = 'card quase'
+            el.className = 'timer quase'
+            card.classList.add('quase'); card.classList.remove('urgente')
           } else {
-            el.className = 'timer ok'; card.className = 'card'
+            el.className = 'timer ok'
+            card.classList.remove('urgente', 'quase')
           }
         }
         atualizar()
         timers[id] = setInterval(atualizar, 1000)
       }
 
-      async function marcarPronto(id) {
-        const btn = document.querySelector(`#card-${id} .btn-pronto`)
-        btn.disabled = true
-        btn.textContent = 'Finalizando...'
+      async function moverStatus(id, status) {
+        const btn = document.querySelector(`#card-${id} .btn-acao`)
+        if (btn) { btn.disabled = true; btn.textContent = 'Salvando...' }
         try {
           await fetchAuth(`/api/pedidos/${id}/status`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'pronto' })
+            body: JSON.stringify({ status })
           })
-          clearInterval(timers[id])
-          delete timers[id]
-          const card = document.getElementById('card-' + id)
-          card.style.opacity = '0'
-          card.style.transition = 'opacity 0.4s'
-          setTimeout(() => {
-            card.remove()
-            delete pedidosAtuais[id]
-            atualizarContador()
-            mostrarVazio(Object.keys(pedidosAtuais).length === 0)
-          }, 400)
+          await carregarPedidos()
         } catch (e) {
-          btn.disabled = false
-          btn.textContent = 'Marcar como pronto'
+          if (btn) { btn.disabled = false; btn.textContent = btn.classList.contains('btn-iniciar') ? 'Iniciar produção' : 'Marcar como pronto' }
           alert('Erro ao atualizar. Tente novamente.')
-        }
-      }
-
-      function atualizarContador() {
-        const n = Object.keys(pedidosAtuais).length
-        document.getElementById('contador').textContent = n + (n === 1 ? ' pedido' : ' pedidos')
-      }
-
-      function mostrarVazio(sim) {
-        const lista = document.getElementById('lista')
-        const vazio = document.getElementById('vazio')
-        if (sim && !vazio) {
-          const div = document.createElement('div')
-          div.id = 'vazio'
-          div.className = 'vazio'
-          div.innerHTML = `
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-              <path d="M16 3H8L6 7h12l-2-4z"/>
-            </svg>
-            <p>Nenhum pedido aguardando</p>
-          `
-          lista.appendChild(div)
-        } else if (!sim && vazio) {
-          vazio.remove()
         }
       }
     </script>

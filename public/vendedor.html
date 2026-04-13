@@ -1,238 +1,303 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Selarón — Vendedor</title>
-  <script src="/auth.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selarón — Vendedor</title>
+    <script src="/auth.js"></script>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; }
 
-    .topo { background: #1a1a2e; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .topo h1 { font-size: 18px; font-weight: 600; }
-    .topo-direita { display: flex; align-items: center; gap: 10px; }
-    .topo span { font-size: 13px; opacity: 0.7; }
-    .btn-sair-topo { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
-    .btn-sair-topo:hover { background: rgba(255,255,255,0.1); }
+      .topo { background: #1a1a2e; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+      .topo h1 { font-size: 18px; font-weight: 600; }
+      .topo-direita { display: flex; align-items: center; gap: 10px; }
+      .topo span { font-size: 13px; opacity: 0.7; }
+      .btn-sair-topo { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
+      .btn-sair-topo:hover { background: rgba(255,255,255,0.1); }
 
-    .conteudo { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+      .conteudo { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
 
-    .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-    .card h2 { font-size: 15px; color: #444; margin-bottom: 14px; }
+      .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+      .card h2 { font-size: 15px; color: #444; margin-bottom: 14px; }
 
-    .foto-area { border: 2px dashed #ccc; border-radius: 10px; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; transition: border-color 0.2s; }
-    .foto-area:hover { border-color: #e63946; }
-    .foto-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; border-radius: 8px; }
-    .foto-area .placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #999; font-size: 14px; z-index: 1; }
-    input[type="file"] { display: none; }
+      .foto-area { border: 2px dashed #ccc; border-radius: 10px; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: border-color 0.2s; }
+      .foto-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; border-radius: 8px; }
+      .placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #999; font-size: 14px; z-index: 1; }
 
-    .tamanhos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-    .tamanho-btn { border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
-    .tamanho-btn:hover { border-color: #e63946; }
-    .tamanho-btn.selecionado { border-color: #e63946; background: #fff5f5; }
-    .tamanho-btn .medida { font-size: 15px; font-weight: 600; color: #1a1a2e; }
-    .tamanho-btn .preco { font-size: 12px; color: #888; margin-top: 2px; }
+      .tamanhos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .tamanho-btn { border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
+      .tamanho-btn:hover { border-color: #e63946; }
+      .tamanho-btn.selecionado { border-color: #e63946; background: #fff5f5; }
+      .tamanho-btn .medida { font-size: 15px; font-weight: 600; color: #1a1a2e; }
+      .tamanho-btn .preco { font-size: 12px; color: #888; margin-top: 2px; }
 
-    label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-    input[type="text"] { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
-    input[type="text"]:focus { border-color: #e63946; }
+      label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+      input[type="text"] { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
+      input[type="text"]:focus { border-color: #e63946; }
 
-    .ponto-selector { display: flex; gap: 10px; }
-    .ponto-btn { flex: 1; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; background: white; font-size: 14px; font-weight: 600; color: #555; transition: all 0.15s; }
-    .ponto-btn:hover { border-color: #e63946; }
-    .ponto-btn.selecionado { border-color: #e63946; background: #fff5f5; color: #e63946; }
+      .ponto-selector { display: flex; gap: 10px; }
+      .ponto-btn { flex: 1; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; background: white; font-size: 14px; font-weight: 600; color: #555; transition: all 0.15s; }
+      .ponto-btn:hover { border-color: #e63946; }
+      .ponto-btn.selecionado { border-color: #e63946; background: #fff5f5; color: #e63946; }
 
-    .btn-enviar { width: 100%; background: #e63946; color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    .btn-enviar:hover { background: #c1121f; }
-    .btn-enviar:disabled { background: #ccc; cursor: not-allowed; }
+      .btn-enviar { width: 100%; background: #e63946; color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-bottom: 16px; }
+      .btn-enviar:hover { background: #c1121f; }
+      .btn-enviar:disabled { background: #ccc; cursor: not-allowed; }
 
-    .sucesso { display: none; text-align: center; padding: 30px 20px; }
-    .sucesso .numero { font-size: 48px; font-weight: 700; color: #e63946; letter-spacing: 4px; margin: 12px 0; }
-    .sucesso p { color: #666; font-size: 14px; }
-    .sucesso img { width: 180px; height: 180px; margin: 12px auto; display: block; border-radius: 8px; }
-    .btn-novo { margin-top: 20px; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px 28px; font-size: 15px; cursor: pointer; }
-  </style>
-</head>
-<body>
-
-<div id="app-vendedor">
-  <div class="topo">
-    <h1>Selarón Azulejos</h1>
-    <div class="topo-direita">
-  <span id="info-vendedor"></span>
-  <button class="btn-sair-topo" onclick="voltarMenu()">Menu</button>
-  <button class="btn-sair-topo" onclick="sair()">Sair</button>
-</div>
-  </div>
-
-  <div class="conteudo">
-    <div id="tela-pedido">
-
-      <div class="card">
-        <h2>Foto do cliente</h2>
-      <div class="foto-area" id="foto-area">
-  <div class="placeholder" id="placeholder">
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-      <circle cx="12" cy="13" r="4"/>
-    </svg>
-    <div style="display:flex; gap:10px; margin-top:8px;">
-      <button onclick="event.stopPropagation(); abrirCamera()" style="background:#e63946; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;">
-        Câmera
-      </button>
-      <button onclick="event.stopPropagation(); abrirGaleria()" style="background:#1a1a2e; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;">
-        Galeria
-      </button>
-    </div>
-  </div>
-  <img id="preview-foto" src="" alt="" style="display:none">
-</div>
-
-<input type="file" id="input-camera" accept="image/*" capture="environment" onchange="mostrarPreview(this)" style="display:none">
-<input type="file" id="input-galeria" accept="image/*" onchange="mostrarPreview(this)" style="display:none">
-
-      <div class="card">
-        <h2>Ponto de venda</h2>
-        <div class="ponto-selector">
-          <div class="ponto-btn selecionado" id="ponto-cima" onclick="selecionarPonto('cima')">Cima da escada</div>
-          <div class="ponto-btn" id="ponto-baixo" onclick="selecionarPonto('baixo')">Baixo da escada</div>
+      .tela-sucesso { text-align: center; padding: 30px 20px; }
+      .tela-sucesso .numero { font-size: 48px; font-weight: 700; color: #e63946; letter-spacing: 4px; margin: 12px 0; }
+      .tela-sucesso p { color: #666; font-size: 14px; }
+      .tela-sucesso img { width: 180px; height: 180px; margin: 12px auto; display: block; border-radius: 8px; }
+      .btn-novo { margin-top: 20px; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px 28px; font-size: 15px; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <div id="app-vendedor">
+      <div class="topo">
+        <h1>Selarón Azulejos</h1>
+        <div class="topo-direita">
+          <span id="info-vendedor"></span>
+          <button class="btn-sair-topo" onclick="voltarMenu()">Menu</button>
+          <button class="btn-sair-topo" onclick="sair()">Sair</button>
         </div>
       </div>
 
-      <div class="card">
-        <h2>Tamanho do azulejo</h2>
-        <div class="tamanhos" id="grade-tamanhos"></div>
-      </div>
+      <div class="conteudo">
+        <!-- TELA DO PEDIDO -->
+        <div id="tela-pedido">
+          <div class="card">
+            <h2>Foto do cliente</h2>
+            <div class="foto-area" id="foto-area">
+              <div class="placeholder" id="placeholder">
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                  />
+                  <circle cx="12" cy="13" r="4" />
+                </svg>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                  <button
+                    onclick="event.stopPropagation(); abrirCamera()"
+                    style="background:#e63946; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;"
+                  >
+                    Câmera
+                  </button>
+                  <button
+                    onclick="event.stopPropagation(); abrirGaleria()"
+                    style="background:#1a1a2e; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;"
+                  >
+                    Galeria
+                  </button>
+                </div>
+              </div>
+              <img id="preview-foto" src="" alt="" style="display:none" />
+            </div>
+            <input
+              type="file"
+              id="input-camera"
+              accept="image/*"
+              capture="environment"
+              onchange="mostrarPreview(this)"
+              style="display:none"
+            />
+            <input
+              type="file"
+              id="input-galeria"
+              accept="image/*"
+              onchange="mostrarPreview(this)"
+              style="display:none"
+            />
+          </div>
 
-      <div class="card">
-        <label>Nome do cliente (opcional)</label>
-        <input type="text" id="nome-cliente" placeholder="Ex: Maria, turista alemã...">
-      </div>
+          <div class="card">
+            <h2>Ponto de venda</h2>
+            <div class="ponto-selector">
+              <div
+                class="ponto-btn selecionado"
+                id="ponto-cima"
+                onclick="selecionarPonto('cima')"
+              >
+                Cima da escada
+              </div>
+              <div
+                class="ponto-btn"
+                id="ponto-baixo"
+                onclick="selecionarPonto('baixo')"
+              >
+                Baixo da escada
+              </div>
+            </div>
+          </div>
 
-      <button class="btn-enviar" id="btn-enviar" onclick="enviarPedido()">Enviar pedido para produção</button>
+          <div class="card">
+            <h2>Tamanho do azulejo</h2>
+            <div class="tamanhos" id="grade-tamanhos"></div>
+          </div>
+
+          <div class="card">
+            <label>Nome do cliente (opcional)</label>
+            <input
+              type="text"
+              id="nome-cliente"
+              placeholder="Ex: Maria, turista alemã..."
+            />
+          </div>
+
+          <button class="btn-enviar" id="btn-enviar" onclick="enviarPedido()">
+            Enviar pedido para produção
+          </button>
+        </div>
+        <!-- FIM TELA DO PEDIDO -->
+
+        <!-- TELA DE SUCESSO -->
+        <div id="tela-sucesso" class="card tela-sucesso" style="display:none">
+          <p>Pedido enviado! Mostre o QR code para o cliente:</p>
+          <div class="numero" id="numero-pedido"></div>
+          <img id="qr-pedido" src="" alt="QR Code" />
+          <p style="font-size:12px; color:#aaa; margin-top:8px;">
+            O cliente escaneia e acompanha em tempo real
+          </p>
+          <button class="btn-novo" onclick="novoPedido()">Novo pedido</button>
+        </div>
+        <!-- FIM TELA DE SUCESSO -->
+      </div>
     </div>
 
-    <div id="tela-sucesso" class="card sucesso">
-      <p>Pedido enviado! Mostre o QR code para o cliente:</p>
-      <div class="numero" id="numero-pedido"></div>
-      <img id="qr-pedido" src="" alt="QR Code">
-      <p style="font-size:12px; color:#aaa;">O cliente escaneia e acompanha em tempo real</p>
-      <button class="btn-novo" onclick="novoPedido()">Novo pedido</button>
-    </div>
-  </div>
-</div>
+    <script>
+      const TAMANHOS = [
+        { medida: '10×10 cm', preco: 25 },
+        { medida: '15×15 cm', preco: 35 },
+        { medida: '20×20 cm', preco: 50 },
+        { medida: '20×30 cm', preco: 65 },
+        { medida: '30×30 cm', preco: 80 },
+        { medida: '30×40 cm', preco: 110 },
+      ]
 
-<script>
-  const TAMANHOS = [
-    { medida: '10×10 cm', preco: 25 },
-    { medida: '15×15 cm', preco: 35 },
-    { medida: '20×20 cm', preco: 50 },
-    { medida: '20×30 cm', preco: 65 },
-    { medida: '30×30 cm', preco: 80 },
-    { medida: '30×40 cm', preco: 110 },
-  ]
+      let usuario = null
+      let tamanhoSelecionado = null
+      let fotoSelecionada = null
+      let pontoSelecionado = 'cima'
 
-  let usuario = null
-  let tamanhoSelecionado = null
-  let fotoSelecionada = null
-  let pontoSelecionado = 'cima'
+      usuario = getUsuario()
+      if (!usuario || !usuario.pode_vender) {
+        window.location.href = '/login.html'
+      } else {
+        document.getElementById('info-vendedor').textContent = usuario.nome
+        renderTamanhos()
+      }
 
-  // verifica autenticação
-  usuario = getUsuario()
-  if (!usuario || !usuario.pode_vender) {
-    window.location.href = '/login.html'
-  } else {
-    document.getElementById('info-vendedor').textContent = usuario.nome
-    renderTamanhos()
-  }
+      function renderTamanhos() {
+        const grade = document.getElementById('grade-tamanhos')
+        grade.innerHTML = TAMANHOS.map((t, i) => `
+          <div class="tamanho-btn" onclick="selecionarTamanho(${i})" id="tam-${i}">
+            <div class="medida">${t.medida}</div>
+            <div class="preco">R$ ${t.preco}</div>
+          </div>
+        `).join('')
+      }
 
-  function renderTamanhos() {
-    const grade = document.getElementById('grade-tamanhos')
-    grade.innerHTML = TAMANHOS.map((t, i) => `
-      <div class="tamanho-btn" onclick="selecionarTamanho(${i})" id="tam-${i}">
-        <div class="medida">${t.medida}</div>
-        <div class="preco">R$ ${t.preco}</div>
-      </div>
-    `).join('')
-  }
+      function selecionarTamanho(i) {
+        document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
+        document.getElementById('tam-' + i).classList.add('selecionado')
+        tamanhoSelecionado = TAMANHOS[i]
+      }
 
-  function selecionarTamanho(i) {
-    document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
-    document.getElementById('tam-' + i).classList.add('selecionado')
-    tamanhoSelecionado = TAMANHOS[i]
-  }
+      function selecionarPonto(ponto) {
+        pontoSelecionado = ponto
+        document.getElementById('ponto-cima').classList.toggle('selecionado', ponto === 'cima')
+        document.getElementById('ponto-baixo').classList.toggle('selecionado', ponto === 'baixo')
+      }
 
-  function selecionarPonto(ponto) {
-    pontoSelecionado = ponto
-    document.getElementById('ponto-cima').classList.toggle('selecionado', ponto === 'cima')
-    document.getElementById('ponto-baixo').classList.toggle('selecionado', ponto === 'baixo')
-  }
+      function abrirCamera() {
+        document.getElementById('input-camera').click()
+      }
 
-function mostrarPreview(input) {
-  if (!input.files[0]) return
-  fotoSelecionada = input.files[0]
-  const url = URL.createObjectURL(fotoSelecionada)
-  const img = document.getElementById('preview-foto')
-  img.src = url
-  img.style.display = 'block'
-  document.getElementById('placeholder').style.display = 'none'
-}
+      function abrirGaleria() {
+        document.getElementById('input-galeria').click()
+      }
 
-  async function enviarPedido() {
-    if (!fotoSelecionada) return alert('Tire uma foto primeiro')
-    if (!tamanhoSelecionado) return alert('Escolha o tamanho do azulejo')
+      function mostrarPreview(input) {
+        if (!input.files[0]) return
+        fotoSelecionada = input.files[0]
+        const url = URL.createObjectURL(fotoSelecionada)
+        const img = document.getElementById('preview-foto')
+        img.src = url
+        img.style.display = 'block'
+        document.getElementById('placeholder').style.display = 'none'
+      }
 
-    const btn = document.getElementById('btn-enviar')
-    btn.disabled = true
-    btn.textContent = 'Enviando...'
+      async function enviarPedido() {
+        if (!fotoSelecionada) return alert('Tire uma foto primeiro')
+        if (!tamanhoSelecionado) return alert('Escolha o tamanho do azulejo')
 
-    const form = new FormData()
-    form.append('foto', fotoSelecionada)
-    form.append('ponto_venda', pontoSelecionado)
-    form.append('tamanho', tamanhoSelecionado.medida)
-    form.append('preco', tamanhoSelecionado.preco)
-    form.append('nome_cliente', document.getElementById('nome-cliente').value)
+        const btn = document.getElementById('btn-enviar')
+        btn.disabled = true
+        btn.textContent = 'Enviando...'
 
-    try {
-      const res = await fetchAuth('/api/pedidos', { method: 'POST', body: form })
-      const data = await res.json()
-      document.getElementById('numero-pedido').textContent = data.numero
-      document.getElementById('qr-pedido').src = data.qrCode
-      document.getElementById('tela-pedido').style.display = 'none'
-      document.getElementById('tela-sucesso').style.display = 'block'
-    } catch (e) {
-      alert('Erro ao enviar pedido. Verifique a conexão.')
-      btn.disabled = false
-      btn.textContent = 'Enviar pedido para produção'
-    }
-  }
+        const form = new FormData()
+        form.append('foto', fotoSelecionada)
+        form.append('ponto_venda', pontoSelecionado)
+        form.append('tamanho', tamanhoSelecionado.medida)
+        form.append('preco', tamanhoSelecionado.preco)
+        form.append('nome_cliente', document.getElementById('nome-cliente').value)
 
-  function novoPedido() {
-    fotoSelecionada = null
-    tamanhoSelecionado = null
-    pontoSelecionado = 'cima'
-    document.getElementById('preview-foto').style.display = 'none'
-document.getElementById('preview-foto').src = ''
-document.getElementById('placeholder').style.display = 'flex'
-document.getElementById('input-camera').value = ''
-document.getElementById('input-galeria').value = ''  
-    document.getElementById('nome-cliente').value = ''    
-    document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
-    selecionarPonto('cima')
-    document.getElementById('tela-sucesso').style.display = 'none'
-    document.getElementById('tela-pedido').style.display = 'block'
-    document.getElementById('btn-enviar').disabled = false
-    document.getElementById('btn-enviar').textContent = 'Enviar pedido para produção'
-  }
+        try {
+          const token = getToken()
+          const res = await fetch('/api/pedidos', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token },
+            body: form
+          })
 
-  function abrirCamera() {
-  document.getElementById('input-camera').click()
-}
+          if (res.status === 401) { sair(); return }
 
-function abrirGaleria() {
-  document.getElementById('input-galeria').click()
-}
-</script>
-</body>
-</html>  
+          if (!res.ok) {
+            const erro = await res.json()
+            alert('Erro: ' + (erro.erro || 'Tente novamente'))
+            btn.disabled = false
+            btn.textContent = 'Enviar pedido para produção'
+            return
+          }
+
+          const data = await res.json()
+          document.getElementById('numero-pedido').textContent = data.numero
+          document.getElementById('qr-pedido').src = data.qrCode
+          document.getElementById('tela-pedido').style.display = 'none'
+          document.getElementById('tela-sucesso').style.display = 'block'
+
+        } catch (e) {
+          console.error(e)
+          alert('Erro ao enviar pedido. Verifique a conexão.')
+          btn.disabled = false
+          btn.textContent = 'Enviar pedido para produção'
+        }
+      }
+
+      function novoPedido() {
+        fotoSelecionada = null
+        tamanhoSelecionado = null
+        pontoSelecionado = 'cima'
+        document.getElementById('preview-foto').style.display = 'none'
+        document.getElementById('preview-foto').src = ''
+        document.getElementById('placeholder').style.display = 'flex'
+        document.getElementById('input-camera').value = ''
+        document.getElementById('input-galeria').value = ''
+        document.getElementById('nome-cliente').value = ''
+        document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
+        selecionarPonto('cima')
+        document.getElementById('tela-sucesso').style.display = 'none'
+        document.getElementById('tela-pedido').style.display = 'block'
+        document.getElementById('btn-enviar').disabled = false
+        document.getElementById('btn-enviar').textContent = 'Enviar pedido para produção'
+      }
+    </script>
+  </body>
+</html>

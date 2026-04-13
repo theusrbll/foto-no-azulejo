@@ -55,14 +55,16 @@ function exigir(permissao) {
 }
 
 function gerarNumero() {
-  const letras = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  const nums = "0123456789";
-  let codigo = "";
-  for (let i = 0; i < 3; i++)
-    codigo += letras[Math.floor(Math.random() * letras.length)];
-  for (let i = 0; i < 3; i++)
-    codigo += nums[Math.floor(Math.random() * nums.length)];
-  return codigo;
+  const sortear = (chars, qtd) =>
+    Array.from(
+      { length: qtd },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join("");
+
+  const letras = sortear("ABCDEFGHJKLMNPQRSTUVWXYZ", 3);
+  const nums = sortear("0123456789", 3);
+
+  return `${letras}${nums}`;
 }
 
 // LOGIN
@@ -160,6 +162,9 @@ app.patch(
   exigir("pode_producao"),
   (req, res) => {
     const { status } = req.body;
+    const statusValidos = ["aguardando", "em_producao", "pronto"];
+    if (!statusValidos.includes(status))
+      return res.status(400).json({ erro: "Status inválido" });
     db.prepare(
       "UPDATE pedidos SET status = ?, atualizado_em = CURRENT_TIMESTAMP WHERE id = ?",
     ).run(status, req.params.id);
@@ -340,6 +345,44 @@ app.get("/api/foto/:numero", (req, res) => {
   res.download(caminho, `selaron-${req.params.numero}.jpg`);
 });
 
+// KANBAN (produção) — novos, em produção e prontos do dia
+app.get(
+  "/api/pedidos/kanban",
+  autenticar,
+  exigir("pode_producao"),
+  (req, res) => {
+    const hoje = new Date().toISOString().slice(0, 10);
+
+    const novos = db
+      .prepare(
+        `
+    SELECT * FROM pedidos WHERE status = 'aguardando' AND DATE(criado_em) = ?
+    ORDER BY criado_em ASC
+  `,
+      )
+      .all(hoje);
+
+    const emProducao = db
+      .prepare(
+        `
+    SELECT * FROM pedidos WHERE status = 'em_producao' AND DATE(criado_em) = ?
+    ORDER BY criado_em ASC
+  `,
+      )
+      .all(hoje);
+
+    const prontos = db
+      .prepare(
+        `
+    SELECT * FROM pedidos WHERE status = 'pronto' AND DATE(criado_em) = ?
+    ORDER BY atualizado_em DESC
+  `,
+      )
+      .all(hoje);
+
+    res.json({ novos, emProducao, prontos });
+  },
+);
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
