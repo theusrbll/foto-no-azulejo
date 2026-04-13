@@ -21,35 +21,49 @@
       .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
       .card h2 { font-size: 15px; color: #444; margin-bottom: 14px; }
 
-      .foto-area { border: 2px dashed #ccc; border-radius: 10px; min-height: 220px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: border-color 0.2s; }
+      .foto-area { border: 2px dashed #ccc; border-radius: 10px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: border-color 0.2s; }
       .foto-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; border-radius: 8px; }
       .placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #999; font-size: 14px; z-index: 1; }
-
-      .tamanhos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-      .tamanho-btn { border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; transition: all 0.15s; background: white; }
-      .tamanho-btn:hover { border-color: #e63946; }
-      .tamanho-btn.selecionado { border-color: #e63946; background: #fff5f5; }
-      .tamanho-btn .medida { font-size: 15px; font-weight: 600; color: #1a1a2e; }
-      .tamanho-btn .preco { font-size: 12px; color: #888; margin-top: 2px; }
-
-      label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-      input[type="text"] { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
-      input[type="text"]:focus { border-color: #e63946; }
 
       .ponto-selector { display: flex; gap: 10px; }
       .ponto-btn { flex: 1; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; background: white; font-size: 14px; font-weight: 600; color: #555; transition: all 0.15s; }
       .ponto-btn:hover { border-color: #e63946; }
       .ponto-btn.selecionado { border-color: #e63946; background: #fff5f5; color: #e63946; }
 
+      .produto-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+      .produto-item:last-child { border-bottom: none; }
+      .produto-info { flex: 1; }
+      .produto-nome { font-size: 14px; font-weight: 500; color: #1a1a2e; }
+      .produto-preco { font-size: 13px; color: #888; margin-top: 2px; }
+      .quantidade-ctrl { display: flex; align-items: center; gap: 10px; }
+      .qty-btn { width: 32px; height: 32px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #444; transition: all 0.15s; line-height: 1; }
+      .qty-btn:hover { border-color: #e63946; color: #e63946; }
+      .qty-num { font-size: 16px; font-weight: 600; color: #1a1a2e; min-width: 20px; text-align: center; }
+
+      .carrinho-resumo { background: #f8f8f8; border-radius: 10px; padding: 14px; margin-top: 4px; }
+      .carrinho-linha { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 6px; }
+      .carrinho-linha:last-child { margin-bottom: 0; font-weight: 600; color: #1a1a2e; font-size: 15px; border-top: 1px solid #e0e0e0; padding-top: 8px; margin-top: 4px; }
+
+      label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+      input[type="text"] { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
+      input[type="text"]:focus { border-color: #e63946; }
+
       .btn-enviar { width: 100%; background: #e63946; color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-bottom: 16px; }
       .btn-enviar:hover { background: #c1121f; }
       .btn-enviar:disabled { background: #ccc; cursor: not-allowed; }
 
-      .tela-sucesso { text-align: center; padding: 30px 20px; }
-      .tela-sucesso .numero { font-size: 48px; font-weight: 700; color: #e63946; letter-spacing: 4px; margin: 12px 0; }
-      .tela-sucesso p { color: #666; font-size: 14px; }
-      .tela-sucesso img { width: 180px; height: 180px; margin: 12px auto; display: block; border-radius: 8px; }
-      .btn-novo { margin-top: 20px; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px 28px; font-size: 15px; cursor: pointer; }
+      .tela-sucesso { text-align: center; padding: 24px 20px; }
+      .tela-sucesso h2 { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
+
+      .pedido-card { background: #f8f8f8; border-radius: 10px; padding: 14px; margin-bottom: 10px; text-align: left; }
+      .pedido-card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      .pedido-numero { font-size: 22px; font-weight: 700; color: #e63946; letter-spacing: 3px; }
+      .pedido-produto { font-size: 13px; color: #666; }
+      .pedido-qr { width: 120px; height: 120px; border-radius: 8px; }
+
+      .btn-novo { width: 100%; margin-top: 16px; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 15px; cursor: pointer; }
+
+      .vazio-produtos { text-align: center; padding: 20px; color: #aaa; font-size: 14px; }
     </style>
   </head>
   <body>
@@ -138,8 +152,17 @@
           </div>
 
           <div class="card">
-            <h2>Tamanho do azulejo</h2>
-            <div class="tamanhos" id="grade-tamanhos"></div>
+            <h2>Produtos</h2>
+            <div id="lista-produtos">
+              <div class="vazio-produtos">Carregando produtos...</div>
+            </div>
+            <div
+              id="carrinho-resumo"
+              style="display:none"
+              class="carrinho-resumo"
+            >
+              <div id="carrinho-linhas"></div>
+            </div>
           </div>
 
           <div class="card">
@@ -159,55 +182,95 @@
 
         <!-- TELA DE SUCESSO -->
         <div id="tela-sucesso" class="card tela-sucesso" style="display:none">
-          <p>Pedido enviado! Mostre o QR code para o cliente:</p>
-          <div class="numero" id="numero-pedido"></div>
-          <img id="qr-pedido" src="" alt="QR Code" />
-          <p style="font-size:12px; color:#aaa; margin-top:8px;">
-            O cliente escaneia e acompanha em tempo real
-          </p>
-          <button class="btn-novo" onclick="novoPedido()">Novo pedido</button>
+          <h2>Pedidos enviados!</h2>
+          <div id="lista-pedidos-criados"></div>
+          <button class="btn-novo" onclick="novoPedido()">Nova venda</button>
         </div>
         <!-- FIM TELA DE SUCESSO -->
       </div>
     </div>
 
     <script>
-      const TAMANHOS = [
-        { medida: '10×10 cm', preco: 25 },
-        { medida: '15×15 cm', preco: 35 },
-        { medida: '20×20 cm', preco: 50 },
-        { medida: '20×30 cm', preco: 65 },
-        { medida: '30×30 cm', preco: 80 },
-        { medida: '30×40 cm', preco: 110 },
-      ]
-
       let usuario = null
-      let tamanhoSelecionado = null
       let fotoSelecionada = null
       let pontoSelecionado = 'cima'
+      let produtos = []
+      let carrinho = {}
 
       usuario = getUsuario()
       if (!usuario || !usuario.pode_vender) {
         window.location.href = '/login.html'
       } else {
         document.getElementById('info-vendedor').textContent = usuario.nome
-        renderTamanhos()
+        carregarProdutos()
       }
 
-      function renderTamanhos() {
-        const grade = document.getElementById('grade-tamanhos')
-        grade.innerHTML = TAMANHOS.map((t, i) => `
-          <div class="tamanho-btn" onclick="selecionarTamanho(${i})" id="tam-${i}">
-            <div class="medida">${t.medida}</div>
-            <div class="preco">R$ ${t.preco}</div>
+      async function carregarProdutos() {
+        try {
+          const res = await fetchAuth('/api/produtos')
+          produtos = await res.json()
+          renderProdutos()
+        } catch (e) {
+          document.getElementById('lista-produtos').innerHTML = '<div class="vazio-produtos">Erro ao carregar produtos</div>'
+        }
+      }
+
+      function renderProdutos() {
+        const lista = document.getElementById('lista-produtos')
+        if (produtos.length === 0) {
+          lista.innerHTML = '<div class="vazio-produtos">Nenhum produto cadastrado</div>'
+          return
+        }
+        lista.innerHTML = produtos.map(p => `
+          <div class="produto-item">
+            <div class="produto-info">
+              <div class="produto-nome">${p.nome}</div>
+              <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+            </div>
+            <div class="quantidade-ctrl">
+              <button class="qty-btn" onclick="alterarQtd('${p.id}', -1)">−</button>
+              <span class="qty-num" id="qty-${p.id}">0</span>
+              <button class="qty-btn" onclick="alterarQtd('${p.id}', 1)">+</button>
+            </div>
           </div>
         `).join('')
       }
 
-      function selecionarTamanho(i) {
-        document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
-        document.getElementById('tam-' + i).classList.add('selecionado')
-        tamanhoSelecionado = TAMANHOS[i]
+      function alterarQtd(id, delta) {
+        const atual = carrinho[id] || 0
+        const novo = Math.max(0, atual + delta)
+        if (novo === 0) delete carrinho[id]
+        else carrinho[id] = novo
+        document.getElementById('qty-' + id).textContent = novo
+        atualizarResumo()
+      }
+
+      function atualizarResumo() {
+        const ids = Object.keys(carrinho)
+        const resumoEl = document.getElementById('carrinho-resumo')
+        const linhasEl = document.getElementById('carrinho-linhas')
+
+        if (ids.length === 0) {
+          resumoEl.style.display = 'none'
+          return
+        }
+
+        let total = 0
+        let totalItens = 0
+        let html = ''
+
+        ids.forEach(id => {
+          const prod = produtos.find(p => p.id === id)
+          if (!prod) return
+          const subtotal = prod.preco * carrinho[id]
+          total += subtotal
+          totalItens += carrinho[id]
+          html += `<div class="carrinho-linha"><span>${prod.nome} × ${carrinho[id]}</span><span>R$ ${subtotal.toFixed(2)}</span></div>`
+        })
+
+        html += `<div class="carrinho-linha"><span>${totalItens} item(s)</span><span>R$ ${total.toFixed(2)}</span></div>`
+        linhasEl.innerHTML = html
+        resumoEl.style.display = 'block'
       }
 
       function selecionarPonto(ponto) {
@@ -216,13 +279,8 @@
         document.getElementById('ponto-baixo').classList.toggle('selecionado', ponto === 'baixo')
       }
 
-      function abrirCamera() {
-        document.getElementById('input-camera').click()
-      }
-
-      function abrirGaleria() {
-        document.getElementById('input-galeria').click()
-      }
+      function abrirCamera() { document.getElementById('input-camera').click() }
+      function abrirGaleria() { document.getElementById('input-galeria').click() }
 
       function mostrarPreview(input) {
         if (!input.files[0]) return
@@ -236,22 +294,27 @@
 
       async function enviarPedido() {
         if (!fotoSelecionada) return alert('Tire uma foto primeiro')
-        if (!tamanhoSelecionado) return alert('Escolha o tamanho do azulejo')
+        const itensCarrinho = Object.keys(carrinho)
+        if (itensCarrinho.length === 0) return alert('Adicione pelo menos um produto')
 
         const btn = document.getElementById('btn-enviar')
         btn.disabled = true
         btn.textContent = 'Enviando...'
 
+        const itens = itensCarrinho.map(id => {
+          const prod = produtos.find(p => p.id === id)
+          return { id, nome: prod.nome, preco: prod.preco, quantidade: carrinho[id] }
+        })
+
         const form = new FormData()
         form.append('foto', fotoSelecionada)
         form.append('ponto_venda', pontoSelecionado)
-        form.append('tamanho', tamanhoSelecionado.medida)
-        form.append('preco', tamanhoSelecionado.preco)
         form.append('nome_cliente', document.getElementById('nome-cliente').value)
+        form.append('itens', JSON.stringify(itens))
 
         try {
           const token = getToken()
-          const res = await fetch('/api/pedidos', {
+          const res = await fetch('/api/pedidos/lote', {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + token },
             body: form
@@ -268,10 +331,7 @@
           }
 
           const data = await res.json()
-          document.getElementById('numero-pedido').textContent = data.numero
-          document.getElementById('qr-pedido').src = data.qrCode
-          document.getElementById('tela-pedido').style.display = 'none'
-          document.getElementById('tela-sucesso').style.display = 'block'
+          mostrarSucesso(data.pedidos)
 
         } catch (e) {
           console.error(e)
@@ -281,9 +341,26 @@
         }
       }
 
+      function mostrarSucesso(pedidos) {
+        const lista = document.getElementById('lista-pedidos-criados')
+        lista.innerHTML = pedidos.map(p => `
+          <div class="pedido-card">
+            <div class="pedido-card-topo">
+              <div>
+                <div class="pedido-numero">${p.numero}</div>
+                <div class="pedido-produto">${p.produto}</div>
+              </div>
+              <img class="pedido-qr" src="${p.qrCode}" alt="QR Code">
+            </div>
+          </div>
+        `).join('')
+        document.getElementById('tela-pedido').style.display = 'none'
+        document.getElementById('tela-sucesso').style.display = 'block'
+      }
+
       function novoPedido() {
         fotoSelecionada = null
-        tamanhoSelecionado = null
+        carrinho = {}
         pontoSelecionado = 'cima'
         document.getElementById('preview-foto').style.display = 'none'
         document.getElementById('preview-foto').src = ''
@@ -291,8 +368,9 @@
         document.getElementById('input-camera').value = ''
         document.getElementById('input-galeria').value = ''
         document.getElementById('nome-cliente').value = ''
-        document.querySelectorAll('.tamanho-btn').forEach(b => b.classList.remove('selecionado'))
+        document.getElementById('carrinho-resumo').style.display = 'none'
         selecionarPonto('cima')
+        renderProdutos()
         document.getElementById('tela-sucesso').style.display = 'none'
         document.getElementById('tela-pedido').style.display = 'block'
         document.getElementById('btn-enviar').disabled = false

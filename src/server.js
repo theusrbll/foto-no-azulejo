@@ -383,6 +383,151 @@ app.get(
     res.json({ novos, emProducao, prontos });
   },
 );
+
+// LISTAR PRODUTOS (público para vendedor)
+app.get("/api/produtos", autenticar, (req, res) => {
+  const produtos = db
+    .prepare("SELECT * FROM produtos WHERE ativo = 1 ORDER BY ordem, nome")
+    .all();
+  res.json(produtos);
+});
+
+// LISTAR TODOS PRODUTOS (gestão)
+app.get(
+  "/api/produtos/todos",
+  autenticar,
+  exigir("pode_gestao"),
+  (req, res) => {
+    const produtos = db
+      .prepare("SELECT * FROM produtos ORDER BY ordem, nome")
+      .all();
+    res.json(produtos);
+  },
+);
+
+// CRIAR PRODUTO
+app.post("/api/produtos", autenticar, exigir("pode_gestao"), (req, res) => {
+  const { nome, preco } = req.body;
+  if (!nome || preco === undefined)
+    return res.status(400).json({ erro: "Nome e preço obrigatórios" });
+  const id = uuidv4();
+  const ordem = db
+    .prepare("SELECT COUNT(*) as total FROM produtos")
+    .get().total;
+  db.prepare(
+    "INSERT INTO produtos (id, nome, preco, ordem) VALUES (?, ?, ?, ?)",
+  ).run(id, nome, parseFloat(preco), ordem);
+  res.json({ id });
+});
+
+// EDITAR PRODUTO
+app.patch(
+  "/api/produtos/:id",
+  autenticar,
+  exigir("pode_gestao"),
+  (req, res) => {
+    const { nome, preco, ativo } = req.body;
+    if (nome !== undefined)
+      db.prepare("UPDATE produtos SET nome = ? WHERE id = ?").run(
+        nome,
+        req.params.id,
+      );
+    if (preco !== undefined)
+      db.prepare("UPDATE produtos SET preco = ? WHERE id = ?").run(
+        parseFloat(preco),
+        req.params.id,
+      );
+    if (ativo !== undefined)
+      db.prepare("UPDATE produtos SET ativo = ? WHERE id = ?").run(
+        ativo ? 1 : 0,
+        req.params.id,
+      );
+    res.json({ ok: true });
+  },
+);
+
+// EXCLUIR PRODUTO
+app.delete(
+  "/api/produtos/:id",
+  autenticar,
+  exigir("pode_gestao"),
+  (req, res) => {
+    db.prepare("DELETE FROM produtos WHERE id = ?").run(req.params.id);
+    res.json({ ok: true });
+  },
+);
+
+// CRIAR PEDIDO EM LOTE (carrinho)
+app.post(
+  "/api/pedidos/lote",
+  autenticar,
+  exigir("pode_vender"),
+  upload.single("foto"),
+  async (req, res) => {
+    if (!req.file) return res.status(400).json({ erro: "Foto obrigatória" });
+
+    let itens;
+    try {
+      itens = JSON.parse(req.body.itens);
+    } catch {
+      return res.status(400).json({ erro: "Itens inválidos" });
+    }
+
+    if (!itens || itens.length === 0)
+      return res.status(400).json({ erro: "Carrinho vazio" });
+
+    const hoje = new Date().toISOString().slice(0, 10);
+    const nomeArquivo = hoje + "/" + req.file.filename;
+    const { ponto_venda, nome_cliente } = req.body;
+    const pedidosCriados = [];
+
+    for (const item of itens) {
+      for (let q = 0; q < item.quantidade; q++) {
+        const id = uuidv4();
+        let numero = gerarNumero();
+        while (
+          db.prepare("SELECT id FROM pedidos WHERE numero = ?").get(numero)
+        ) {
+          numero = gerarNumero();
+        }
+
+        const baseUrl = `http://${req.hostname}:${PORT}`;
+        const urlRastreio = `${baseUrl}/rastrear.html?pedido=${numero}`;
+        const qrDataUrl = await QRCode.toDataURL(urlRastreio, {
+          width: 300,
+          margin: 2,
+        });
+
+        db.prepare(
+          `
+        INSERT INTO pedidos (id, numero, vendedor_id, vendedor_nome, ponto_venda, foto, tamanho, preco, nome_cliente, qr_code)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+        ).run(
+          id,
+          numero,
+          req.usuario.id,
+          req.usuario.nome,
+          ponto_venda,
+          nomeArquivo,
+          item.nome,
+          item.preco,
+          nome_cliente || null,
+          qrDataUrl,
+        );
+
+        pedidosCriados.push({
+          id,
+          numero,
+          qrCode: qrDataUrl,
+          produto: item.nome,
+        });
+      }
+    }
+
+    res.json({ pedidos: pedidosCriados });
+  },
+);
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

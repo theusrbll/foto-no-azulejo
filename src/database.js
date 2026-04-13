@@ -32,6 +32,15 @@ db.exec(`
     criado_em DATETIME DEFAULT CURRENT_TIMESTAMP,
     atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS produtos (
+  id TEXT PRIMARY KEY,
+  nome TEXT NOT NULL,
+  preco REAL NOT NULL,
+  ativo INTEGER DEFAULT 1,
+  ordem INTEGER DEFAULT 0,
+  criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 `);
 
 // cria usuários iniciais se não existirem
@@ -58,6 +67,24 @@ if (!existe) {
     ).run(uuidv4(), u.nome, hash, u.vender, u.producao, u.gestao);
   }
   console.log("Usuários iniciais criados");
+}
+
+const produtoExiste = db.prepare("SELECT id FROM produtos LIMIT 1").get();
+if (!produtoExiste) {
+  const produtos = [
+    { nome: "Azulejo 10×10 cm", preco: 25 },
+    { nome: "Azulejo 15×15 cm", preco: 35 },
+    { nome: "Azulejo 20×20 cm", preco: 50 },
+    { nome: "Azulejo 20×30 cm", preco: 65 },
+    { nome: "Azulejo 30×30 cm", preco: 80 },
+    { nome: "Azulejo 30×40 cm", preco: 110 },
+  ];
+  produtos.forEach((p, i) => {
+    db.prepare(
+      "INSERT INTO produtos (id, nome, preco, ordem) VALUES (?, ?, ?, ?)",
+    ).run(uuidv4(), p.nome, p.preco, i);
+  });
+  console.log("Produtos iniciais criados");
 }
 
 module.exports = db;
