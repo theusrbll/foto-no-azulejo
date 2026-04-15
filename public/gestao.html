@@ -186,355 +186,358 @@
     </div>
 
     <script>
-                    let usuarioLogado = null
+                          let usuarioLogado = null
 
-                    usuarioLogado = getUsuario()
-                    if (!usuarioLogado || !usuarioLogado.pode_gestao) {
-                      window.location.href = '/login.html'
-                    } else {
-                      const hoje = new Date().toISOString().slice(0, 10)
-                      document.getElementById('filtro-data').value = hoje
-                      document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
-                      carregarTudo()
-                      setInterval(carregarTudo, 30000)
-                    }
-            function mostrarAba(aba) {
-              ['resumo', 'produtos', 'usuarios'].forEach(a => {
-                document.getElementById('painel-' + a).style.display = a === aba ? 'block' : 'none'
-                document.getElementById('aba-' + a).className = a === aba ? 'aba ativa' : 'aba inativa'
-              })
-              if (aba === 'usuarios') carregarUsuarios()
-              if (aba === 'produtos') carregarProdutosGestao()
-            }
-
-                    async function carregarTudo() {
-                      const data = document.getElementById('filtro-data').value
-                      await Promise.all([carregarResumo(), carregarHistorico(data)])
-                    }
-
-                    async function carregarResumo() {
-                      const data = document.getElementById('filtro-data').value
-                      const res = await fetchAuth('/api/gestao/resumo?data=' + data)
-                      const d = await res.json()
-                      const total = d.totalDia.total || 0
-                      const fat = d.totalDia.faturamento || 0
-                      const ticket = total > 0 ? fat / total : 0
-                      document.getElementById('m-total').textContent = total
-                      document.getElementById('m-faturamento').textContent = 'R$ ' + fat.toFixed(2)
-                      document.getElementById('m-ticket').textContent = 'R$ ' + ticket.toFixed(2)
-                      document.getElementById('m-atrasados').textContent = d.atrasados.total
-                      if (d.atrasados.total > 0) {
-                        document.getElementById('alerta-atrasados').style.display = 'flex'
-                        document.getElementById('texto-alerta').textContent = `${d.atrasados.total} pedido(s) passaram de 10 minutos sem ser marcado como pronto!`
-                      } else {
-                        document.getElementById('alerta-atrasados').style.display = 'none'
-                      }
-                      const maxPonto = Math.max(...d.porPonto.map(p => p.total), 1)
-                      document.getElementById('pontos-venda').innerHTML = d.porPonto.length === 0
-                        ? '<div class="vazio-tabela">Nenhum dado</div>'
-                        : d.porPonto.map(p => `
-                            <div style="margin-bottom:14px">
-                              <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px">
-                                <span class="badge-ponto ${p.ponto_venda === 'cima' ? 'cima' : p.ponto_venda === 'baixo' ? 'baixo' : 'outro'}">${p.ponto_venda}</span>
-                                <span style="font-weight:600">${p.total} pedido(s)</span>
-                              </div>
-                              <div class="barra-fundo"><div class="barra-fill" style="width:${Math.round(p.total / maxPonto * 100)}%"></div></div>
-                            </div>`).join('')
-                      document.getElementById('tabela-vendedores').innerHTML = d.porVendedor.length === 0
-                        ? '<tr><td colspan="3" class="vazio-tabela">Nenhuma venda no período</td></tr>'
-                        : d.porVendedor.map(v => `
-                            <tr>
-                              <td>${v.vendedor}</td>
-                              <td>${v.total}</td>
-                              <td class="td-valor">R$ ${(v.faturamento || 0).toFixed(2)}</td>
-                            </tr>`).join('')
-                    }
-
-                    async function carregarHistorico(data) {
-                      const res = await fetchAuth('/api/gestao/historico?data=' + data)
-                      const pedidos = await res.json()
-                      document.getElementById('historico').innerHTML = pedidos.length === 0
-                        ? '<div class="vazio-tabela">Nenhum pedido no período</div>'
-                        : pedidos.map(p => {
-                            const hora = new Date(p.criado_em + 'Z').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-                            return `
-                              <div class="historico-linha">
-                                <div>
-                                  <div class="historico-numero">${p.numero}</div>
-                                  <div class="historico-info">${p.vendedor_nome} · ${p.ponto_venda} · ${p.tamanho} · ${hora}</div>
-                                </div>
-                                <div style="text-align:right">
-                                  <div class="historico-valor">R$ ${parseFloat(p.preco).toFixed(2)}</div>
-                                  <span class="status-pill ${p.status}">${p.status === 'pronto' ? 'Pronto' : 'Aguardando'}</span>
-                                </div>
-                              </div>`
-                          }).join('')
-                    }
-
-                    async function carregarUsuarios() {
-                    const res = await fetchAuth('/api/usuarios')
-                    const usuarios = await res.json()
-                    document.getElementById('painel-usuarios').innerHTML = `
-                      <div class="card">
-                        <h2>Cadastrar novo usuário</h2>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
-                          <div>
-                            <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Nome</label>
-                            <input type="text" id="novo-nome" placeholder="Nome do usuário">
-                          </div>
-                          <div>
-                            <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Senha</label>
-                            <input type="password" id="nova-senha" placeholder="Senha">
-                          </div>
-                        </div>
-                        <div style="margin-bottom:14px;">
-                          <label style="font-size:12px;color:#999;display:block;margin-bottom:8px;">Permissões</label>
-                          <div class="permissao-check">
-                            <label><input type="checkbox" id="p-vender"> Vendas</label>
-                            <label><input type="checkbox" id="p-producao"> Produção</label>
-                            <label><input type="checkbox" id="p-gestao"> Gestão</label>
-                          </div>
-                        </div>
-                        <button onclick="cadastrarUsuario()" style="background:#e63946;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;">Cadastrar</button>
-                        <span id="msg-cadastro" style="font-size:13px;margin-left:12px;"></span>
-                      </div>
-
-                      <div class="card">
-                        <h2>Usuários cadastrados</h2>
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>Nome</th>
-                              <th>Vendas</th>
-                              <th>Produção</th>
-                              <th>Gestão</th>
-                              <th>Status</th>
-                              <th>Ações</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            ${usuarios.map(u => `
-                              <tr id="linha-${u.id}">
-                                <td style="font-weight:500">${u.nome}</td>
-                                <td>
-                                  <input type="checkbox" ${u.pode_vender ? 'checked' : ''}
-                                    onchange="alterarPermissao('${u.id}', 'pode_vender', this.checked)"
-                                    title="Permissão de vendas">
-                                </td>
-                                <td>
-                                  <input type="checkbox" ${u.pode_producao ? 'checked' : ''}
-                                    onchange="alterarPermissao('${u.id}', 'pode_producao', this.checked)"
-                                    title="Permissão de produção">
-                                </td>
-                                <td>
-                                  <input type="checkbox" ${u.pode_gestao ? 'checked' : ''}
-                                    onchange="alterarPermissao('${u.id}', 'pode_gestao', this.checked)"
-                                    title="Permissão de gestão">
-                                </td>
-                                <td>
-                                  <span class="status-pill ${u.ativo ? 'pronto' : 'aguardando'}">${u.ativo ? 'Ativo' : 'Inativo'}</span>
-                                </td>
-                                <td style="display:flex;gap:6px;flex-wrap:wrap;padding:12px 0;">
-                                  <button onclick="toggleAtivo('${u.id}', ${u.ativo})"
-                                    style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">
-                                    ${u.ativo ? 'Desativar' : 'Ativar'}
-                                  </button>
-                                  <button onclick="editarSenha('${u.id}')"
-                                    style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">
-                                    Senha
-                                  </button>
-                                  <button onclick="excluirUsuario('${u.id}', '${u.nome}')"
-                                    style="background:none;border:1px solid #fcc;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#c62828;">
-                                    Excluir
-                                  </button>
-                                </td>
-                              </tr>`).join('')}
-                          </tbody>
-                        </table>
-                      </div>`
-                  }
-
-                    async function cadastrarUsuario() {
-                      const nome = document.getElementById('novo-nome').value.trim()
-                      const senha = document.getElementById('nova-senha').value.trim()
-                      const pode_vender = document.getElementById('p-vender').checked
-                      const pode_producao = document.getElementById('p-producao').checked
-                      const pode_gestao = document.getElementById('p-gestao').checked
-                      const msg = document.getElementById('msg-cadastro')
-
-                      if (!nome || !senha) { msg.textContent = 'Preencha nome e senha'; msg.style.color = '#e63946'; return }
-                      if (!pode_vender && !pode_producao && !pode_gestao) { msg.textContent = 'Selecione ao menos uma permissão'; msg.style.color = '#e63946'; return }
-
-                      const res = await fetchAuth('/api/usuarios', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nome, senha, pode_vender, pode_producao, pode_gestao })
-                      })
-                      const data = await res.json()
-                      if (!res.ok) { msg.textContent = data.erro; msg.style.color = '#e63946'; return }
-                      msg.textContent = 'Cadastrado com sucesso!'; msg.style.color = '#1a8a3c'
-                      document.getElementById('novo-nome').value = ''
-                      document.getElementById('nova-senha').value = ''
-                      document.getElementById('p-vender').checked = false
-                      document.getElementById('p-producao').checked = false
-                      document.getElementById('p-gestao').checked = false
-                      setTimeout(() => carregarUsuarios(), 800)
-                    }
-
-                    async function toggleAtivo(id, ativoAtual) {
-                      await fetchAuth(`/api/usuarios/${id}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ativo: !ativoAtual })
-                      })
-                      carregarUsuarios()
-                    }
-
-                    async function editarSenha(id) {
-                      const nova = prompt('Digite a nova senha:')
-                      if (!nova || !nova.trim()) return
-                      await fetchAuth(`/api/usuarios/${id}`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ senha: nova.trim() })
-                      })
-                      alert('Senha atualizada!')
-                    }
-
-                    async function alterarPermissao(id, permissao, valor) {
-                    const res = await fetchAuth(`/api/usuarios/${id}`, {
-                      method: 'PATCH',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ [permissao]: valor })
+                          usuarioLogado = getUsuario()
+                          if (!usuarioLogado || !usuarioLogado.pode_gestao) {
+                            window.location.href = '/login.html'
+                          } else {
+                            const hoje = new Date().toISOString().slice(0, 10)
+                            document.getElementById('filtro-data').value = hoje
+                            document.getElementById('data-hoje').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })
+                            carregarTudo()
+                            setInterval(carregarTudo, 30000)
+                          }
+                  function mostrarAba(aba) {
+                    ['resumo', 'produtos', 'usuarios'].forEach(a => {
+                      document.getElementById('painel-' + a).style.display = a === aba ? 'block' : 'none'
+                      document.getElementById('aba-' + a).className = a === aba ? 'aba ativa' : 'aba inativa'
                     })
-                    if (!res.ok) {
-                      alert('Erro ao alterar permissão')
-                      carregarUsuarios()
-                    }
+                    if (aba === 'usuarios') carregarUsuarios()
+                    if (aba === 'produtos') carregarProdutosGestao()
                   }
 
-                  async function excluirUsuario(id, nome) {
-                    if (!confirm(`Tem certeza que deseja excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return
-                    const res = await fetchAuth(`/api/usuarios/${id}`, { method: 'DELETE' })
-                    const data = await res.json()
-                    if (!res.ok) { alert(data.erro); return }
-                    carregarUsuarios()
-                  }
+                          async function carregarTudo() {
+                            const data = document.getElementById('filtro-data').value
+                            await Promise.all([carregarResumo(), carregarHistorico(data)])
+                          }
 
-                  async function carregarProdutosGestao() {
-        const res = await fetchAuth('/api/produtos/todos')
-        const produtos = await res.json()
+                          async function carregarResumo() {
+                            const data = document.getElementById('filtro-data').value
+                            const res = await fetchAuth('/api/gestao/resumo?data=' + data)
+                            const d = await res.json()
+                            const total = d.totalDia.total || 0
+                            const fat = d.totalDia.faturamento || 0
+                            const ticket = total > 0 ? fat / total : 0
+                            document.getElementById('m-total').textContent = total
+                            document.getElementById('m-faturamento').textContent = 'R$ ' + fat.toFixed(2)
+                            document.getElementById('m-ticket').textContent = 'R$ ' + ticket.toFixed(2)
+                            document.getElementById('m-atrasados').textContent = d.atrasados.total
+                            if (d.atrasados.total > 0) {
+                              document.getElementById('alerta-atrasados').style.display = 'flex'
+                              document.getElementById('texto-alerta').textContent = `${d.atrasados.total} pedido(s) passaram de 10 minutos sem ser marcado como pronto!`
+                            } else {
+                              document.getElementById('alerta-atrasados').style.display = 'none'
+                            }
+                            const maxPonto = Math.max(...d.porPonto.map(p => p.total), 1)
+                            document.getElementById('pontos-venda').innerHTML = d.porPonto.length === 0
+                              ? '<div class="vazio-tabela">Nenhum dado</div>'
+                              : d.porPonto.map(p => `
+                                  <div style="margin-bottom:14px">
+                                    <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px">
+                                      <span class="badge-ponto ${p.ponto_venda === 'cima' ? 'cima' : p.ponto_venda === 'baixo' ? 'baixo' : 'outro'}">${p.ponto_venda}</span>
+                                      <span style="font-weight:600">${p.total} pedido(s)</span>
+                                    </div>
+                                    <div class="barra-fundo"><div class="barra-fill" style="width:${Math.round(p.total / maxPonto * 100)}%"></div></div>
+                                  </div>`).join('')
+                            document.getElementById('tabela-vendedores').innerHTML = d.porVendedor.length === 0
+                              ? '<tr><td colspan="3" class="vazio-tabela">Nenhuma venda no período</td></tr>'
+                              : d.porVendedor.map(v => `
+                                  <tr>
+                                    <td>${v.vendedor}</td>
+                                    <td>${v.total}</td>
+                                    <td class="td-valor">R$ ${(v.faturamento || 0).toFixed(2)}</td>
+                                  </tr>`).join('')
+                          }
 
-        document.getElementById('painel-produtos').innerHTML = `
-          <div class="card">
-            <h2>Cadastrar novo produto</h2>
-            <div style="display:grid; grid-template-columns:1fr auto; gap:12px; align-items:end;">
-              <div>
-                <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Nome do produto</label>
-                <input type="text" id="prod-nome" placeholder="Ex: Caneca 300ml, Quadro 20×30...">
-              </div>
-              <div>
-                <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Preço (R$)</label>
-                <input type="text" id="prod-preco" placeholder="0.00" style="width:100px;">
-              </div>
-            </div>
-            <div style="margin-top:12px; display:flex; align-items:center; gap:12px;">
-              <button onclick="cadastrarProduto()" style="background:#e63946;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;">Cadastrar</button>
-              <span id="msg-produto" style="font-size:13px;"></span>
-            </div>
-          </div>
+                          async function carregarHistorico(data) {
+                            const res = await fetchAuth('/api/gestao/historico?data=' + data)
+                            const pedidos = await res.json()
+                            document.getElementById('historico').innerHTML = pedidos.length === 0
+                              ? '<div class="vazio-tabela">Nenhum pedido no período</div>'
+                              : pedidos.map(p => {
+                                  const hora = new Date(p.criado_em + 'Z').toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                                  return `
+                                    <div class="historico-linha">
+                                      <div>
+                                        <div class="historico-numero">${p.numero}</div>
+                                        <div class="historico-info">${p.vendedor_nome} · ${p.ponto_venda} · ${p.tamanho} · ${hora}</div>
+                                      </div>
+                                      <div style="text-align:right">
+                                        <div class="historico-valor">R$ ${parseFloat(p.preco).toFixed(2)}</div>
+                                        <span class="status-pill ${p.status}">${p.status === 'pronto' ? 'Pronto' : 'Aguardando'}</span>
+                                      </div>
+                                    </div>`
+                                }).join('')
+                          }
 
-          <div class="card">
-            <h2>Produtos cadastrados</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Preço</th>
-                  <th>Visível</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${produtos.length === 0
-                  ? '<tr><td colspan="4" class="vazio-tabela">Nenhum produto cadastrado</td></tr>'
-                  : produtos.map(p => `
-                    <tr id="prod-linha-${p.id}">
-                      <td style="font-weight:500">${p.nome}</td>
-                      <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
-                      <td>
-                        <input type="checkbox" ${p.ativo ? 'checked' : ''}
-                          onchange="toggleProduto('${p.id}', this.checked)"
-                          title="${p.ativo ? 'Visível para vendedores' : 'Oculto'}">
-                      </td>
-                      <td style="display:flex; gap:6px; padding:12px 0; flex-wrap:wrap;">
-                        <button onclick="editarProduto('${p.id}', '${p.nome.replace(/'/g, "\\'")}', ${p.preco})"
-                          style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">
-                          Editar
-                        </button>
-                        <button onclick="excluirProduto('${p.id}', '${p.nome.replace(/'/g, "\\'")}')"
-                          style="background:none;border:1px solid #fcc;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#c62828;">
-                          Excluir
-                        </button>
-                      </td>
-                    </tr>`).join('')}
-              </tbody>
-            </table>
-          </div>
-        `
-      }
+                          async function carregarUsuarios() {
+                          const res = await fetchAuth('/api/usuarios')
+                          const usuarios = await res.json()
+                          document.getElementById('painel-usuarios').innerHTML = `
+                            <div class="card">
+                              <h2>Cadastrar novo usuário</h2>
+                              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+                                <div>
+                                  <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Nome</label>
+                                  <input type="text" id="novo-nome" placeholder="Nome do usuário">
+                                </div>
+                                <div>
+                                  <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Senha</label>
+                                  <input type="password" id="nova-senha" placeholder="Senha">
+                                </div>
+                              </div>
+                              <div style="margin-bottom:14px;">
+                                <label style="font-size:12px;color:#999;display:block;margin-bottom:8px;">Permissões</label>
+                                <div class="permissao-check">
+                                  <label><input type="checkbox" id="p-vender"> Vendas</label>
+                                  <label><input type="checkbox" id="p-producao"> Produção</label>
+                                  <label><input type="checkbox" id="p-gestao"> Gestão</label>
+                                </div>
+                              </div>
+                              <button onclick="cadastrarUsuario()" style="background:#e63946;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;">Cadastrar</button>
+                              <span id="msg-cadastro" style="font-size:13px;margin-left:12px;"></span>
+                            </div>
 
-      async function cadastrarProduto() {
-        const nome = document.getElementById('prod-nome').value.trim()
-        const preco = parseFloat(document.getElementById('prod-preco').value.replace(',', '.'))
-        const msg = document.getElementById('msg-produto')
+                            <div class="card">
+                              <h2>Usuários cadastrados</h2>
+                              <table>
+                                <thead>
+                                  <tr>
+                                    <th>Nome</th>
+                                    <th>Vendas</th>
+                                    <th>Produção</th>
+                                    <th>Gestão</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  ${usuarios.map(u => `
+                                    <tr id="linha-${u.id}">
+                                      <td style="font-weight:500">${u.nome}</td>
+                                      <td>
+                                        <input type="checkbox" ${u.pode_vender ? 'checked' : ''}
+                                          onchange="alterarPermissao('${u.id}', 'pode_vender', this.checked)"
+                                          title="Permissão de vendas">
+                                      </td>
+                                      <td>
+                                        <input type="checkbox" ${u.pode_producao ? 'checked' : ''}
+                                          onchange="alterarPermissao('${u.id}', 'pode_producao', this.checked)"
+                                          title="Permissão de produção">
+                                      </td>
+                                      <td>
+                                        <input type="checkbox" ${u.pode_gestao ? 'checked' : ''}
+                                          onchange="alterarPermissao('${u.id}', 'pode_gestao', this.checked)"
+                                          title="Permissão de gestão">
+                                      </td>
+                                      <td>
+                                        <span class="status-pill ${u.ativo ? 'pronto' : 'aguardando'}">${u.ativo ? 'Ativo' : 'Inativo'}</span>
+                                      </td>
+                                      <td style="display:flex;gap:6px;flex-wrap:wrap;padding:12px 0;">
+                                        <button onclick="toggleAtivo('${u.id}', ${u.ativo})"
+                                          style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">
+                                          ${u.ativo ? 'Desativar' : 'Ativar'}
+                                        </button>
+                                        <button onclick="editarSenha('${u.id}')"
+                                          style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">
+                                          Senha
+                                        </button>
+                                        <button onclick="excluirUsuario('${u.id}', '${u.nome}')"
+                                          style="background:none;border:1px solid #fcc;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#c62828;">
+                                          Excluir
+                                        </button>
+                                      </td>
+                                    </tr>`).join('')}
+                                </tbody>
+                              </table>
+                            </div>`
+                        }
 
-        if (!nome) { msg.textContent = 'Digite o nome do produto'; msg.style.color = '#e63946'; return }
-        if (isNaN(preco) || preco <= 0) { msg.textContent = 'Digite um preço válido'; msg.style.color = '#e63946'; return }
+                          async function cadastrarUsuario() {
+                            const nome = document.getElementById('novo-nome').value.trim()
+                            const senha = document.getElementById('nova-senha').value.trim()
+                            const pode_vender = document.getElementById('p-vender').checked
+                            const pode_producao = document.getElementById('p-producao').checked
+                            const pode_gestao = document.getElementById('p-gestao').checked
+                            const msg = document.getElementById('msg-cadastro')
 
-        const res = await fetchAuth('/api/produtos', {
-          method: 'POST',
+                            if (!nome || !senha) { msg.textContent = 'Preencha nome e senha'; msg.style.color = '#e63946'; return }
+                            if (!pode_vender && !pode_producao && !pode_gestao) { msg.textContent = 'Selecione ao menos uma permissão'; msg.style.color = '#e63946'; return }
+
+                            const res = await fetchAuth('/api/usuarios', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ nome, senha, pode_vender, pode_producao, pode_gestao })
+                            })
+                            const data = await res.json()
+                            if (!res.ok) { msg.textContent = data.erro; msg.style.color = '#e63946'; return }
+                            msg.textContent = 'Cadastrado com sucesso!'; msg.style.color = '#1a8a3c'
+                            document.getElementById('novo-nome').value = ''
+                            document.getElementById('nova-senha').value = ''
+                            document.getElementById('p-vender').checked = false
+                            document.getElementById('p-producao').checked = false
+                            document.getElementById('p-gestao').checked = false
+                            setTimeout(() => carregarUsuarios(), 800)
+                          }
+
+                          async function toggleAtivo(id, ativoAtual) {
+                            await fetchAuth(`/api/usuarios/${id}`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ ativo: !ativoAtual })
+                            })
+                            carregarUsuarios()
+                          }
+
+                          async function editarSenha(id) {
+        const nova = prompt('Digite a nova senha:\n\nRequisitos:\n• Mínimo 8 caracteres\n• Uma letra maiúscula\n• Um número')
+        if (!nova || !nova.trim()) return
+
+        const res = await fetchAuth(`/api/usuarios/${id}`, {
+          method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome, preco })
+          body: JSON.stringify({ senha: nova.trim() })
         })
         const data = await res.json()
-        if (!res.ok) { msg.textContent = data.erro; msg.style.color = '#e63946'; return }
-
-        msg.textContent = 'Produto cadastrado!'; msg.style.color = '#1a8a3c'
-        document.getElementById('prod-nome').value = ''
-        document.getElementById('prod-preco').value = ''
-        setTimeout(() => carregarProdutosGestao(), 800)
+        if (!res.ok) { alert('Erro: ' + data.erro); return }
+        alert('Senha atualizada com sucesso!')
       }
 
-      async function toggleProduto(id, ativo) {
-        await fetchAuth(`/api/produtos/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ativo })
-        })
-      }
+                          async function alterarPermissao(id, permissao, valor) {
+                          const res = await fetchAuth(`/api/usuarios/${id}`, {
+                            method: 'PATCH',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ [permissao]: valor })
+                          })
+                          if (!res.ok) {
+                            alert('Erro ao alterar permissão')
+                            carregarUsuarios()
+                          }
+                        }
 
-      async function editarProduto(id, nomeAtual, precoAtual) {
-        const novoNome = prompt('Nome do produto:', nomeAtual)
-        if (novoNome === null) return
-        const novoPreco = prompt('Preço (R$):', precoAtual)
-        if (novoPreco === null) return
-        const preco = parseFloat(novoPreco.replace(',', '.'))
-        if (isNaN(preco) || preco <= 0) { alert('Preço inválido'); return }
+                        async function excluirUsuario(id, nome) {
+                          if (!confirm(`Tem certeza que deseja excluir o usuário "${nome}"? Esta ação não pode ser desfeita.`)) return
+                          const res = await fetchAuth(`/api/usuarios/${id}`, { method: 'DELETE' })
+                          const data = await res.json()
+                          if (!res.ok) { alert(data.erro); return }
+                          carregarUsuarios()
+                        }
 
-        await fetchAuth(`/api/produtos/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome: novoNome.trim(), preco })
-        })
-        carregarProdutosGestao()
-      }
+                        async function carregarProdutosGestao() {
+              const res = await fetchAuth('/api/produtos/todos')
+              const produtos = await res.json()
 
-      async function excluirProduto(id, nome) {
-        if (!confirm(`Excluir o produto "${nome}"? Esta ação não pode ser desfeita.`)) return
-        await fetchAuth(`/api/produtos/${id}`, { method: 'DELETE' })
-        carregarProdutosGestao()
-      }
+              document.getElementById('painel-produtos').innerHTML = `
+                <div class="card">
+                  <h2>Cadastrar novo produto</h2>
+                  <div style="display:grid; grid-template-columns:1fr auto; gap:12px; align-items:end;">
+                    <div>
+                      <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Nome do produto</label>
+                      <input type="text" id="prod-nome" placeholder="Ex: Caneca 300ml, Quadro 20×30...">
+                    </div>
+                    <div>
+                      <label style="font-size:12px;color:#999;display:block;margin-bottom:4px;">Preço (R$)</label>
+                      <input type="text" id="prod-preco" placeholder="0.00" style="width:100px;">
+                    </div>
+                  </div>
+                  <div style="margin-top:12px; display:flex; align-items:center; gap:12px;">
+                    <button onclick="cadastrarProduto()" style="background:#e63946;color:white;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;">Cadastrar</button>
+                    <span id="msg-produto" style="font-size:13px;"></span>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <h2>Produtos cadastrados</h2>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Visível</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${produtos.length === 0
+                        ? '<tr><td colspan="4" class="vazio-tabela">Nenhum produto cadastrado</td></tr>'
+                        : produtos.map(p => `
+                          <tr id="prod-linha-${p.id}">
+                            <td style="font-weight:500">${p.nome}</td>
+                            <td>R$ ${parseFloat(p.preco).toFixed(2)}</td>
+                            <td>
+                              <input type="checkbox" ${p.ativo ? 'checked' : ''}
+                                onchange="toggleProduto('${p.id}', this.checked)"
+                                title="${p.ativo ? 'Visível para vendedores' : 'Oculto'}">
+                            </td>
+                            <td style="display:flex; gap:6px; padding:12px 0; flex-wrap:wrap;">
+                              <button onclick="editarProduto('${p.id}', '${p.nome.replace(/'/g, "\\'")}', ${p.preco})"
+                                style="background:none;border:1px solid #ddd;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;">
+                                Editar
+                              </button>
+                              <button onclick="excluirProduto('${p.id}', '${p.nome.replace(/'/g, "\\'")}')"
+                                style="background:none;border:1px solid #fcc;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#c62828;">
+                                Excluir
+                              </button>
+                            </td>
+                          </tr>`).join('')}
+                    </tbody>
+                  </table>
+                </div>
+              `
+            }
+
+            async function cadastrarProduto() {
+              const nome = document.getElementById('prod-nome').value.trim()
+              const preco = parseFloat(document.getElementById('prod-preco').value.replace(',', '.'))
+              const msg = document.getElementById('msg-produto')
+
+              if (!nome) { msg.textContent = 'Digite o nome do produto'; msg.style.color = '#e63946'; return }
+              if (isNaN(preco) || preco <= 0) { msg.textContent = 'Digite um preço válido'; msg.style.color = '#e63946'; return }
+
+              const res = await fetchAuth('/api/produtos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, preco })
+              })
+              const data = await res.json()
+              if (!res.ok) { msg.textContent = data.erro; msg.style.color = '#e63946'; return }
+
+              msg.textContent = 'Produto cadastrado!'; msg.style.color = '#1a8a3c'
+              document.getElementById('prod-nome').value = ''
+              document.getElementById('prod-preco').value = ''
+              setTimeout(() => carregarProdutosGestao(), 800)
+            }
+
+            async function toggleProduto(id, ativo) {
+              await fetchAuth(`/api/produtos/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ativo })
+              })
+            }
+
+            async function editarProduto(id, nomeAtual, precoAtual) {
+              const novoNome = prompt('Nome do produto:', nomeAtual)
+              if (novoNome === null) return
+              const novoPreco = prompt('Preço (R$):', precoAtual)
+              if (novoPreco === null) return
+              const preco = parseFloat(novoPreco.replace(',', '.'))
+              if (isNaN(preco) || preco <= 0) { alert('Preço inválido'); return }
+
+              await fetchAuth(`/api/produtos/${id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome: novoNome.trim(), preco })
+              })
+              carregarProdutosGestao()
+            }
+
+            async function excluirProduto(id, nome) {
+              if (!confirm(`Excluir o produto "${nome}"? Esta ação não pode ser desfeita.`)) return
+              await fetchAuth(`/api/produtos/${id}`, { method: 'DELETE' })
+              carregarProdutosGestao()
+            }
     </script>
   </body>
 </html>

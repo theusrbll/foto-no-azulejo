@@ -67,11 +67,21 @@ function gerarNumero() {
   return `${letras}${nums}`;
 }
 
+function validarSenha(senha) {
+  if (senha.length < 8) return "A senha deve ter pelo menos 8 caracteres";
+  if (!/[A-Z]/.test(senha))
+    return "A senha deve ter pelo menos uma letra maiúscula";
+  if (!/[0-9]/.test(senha)) return "A senha deve ter pelo menos um número";
+  return null;
+}
+
 // LOGIN
 app.post("/api/login", async (req, res) => {
   const { nome, senha } = req.body;
   const usuario = db
-    .prepare("SELECT * FROM usuarios WHERE nome = ? AND ativo = 1")
+    .prepare(
+      "SELECT * FROM usuarios WHERE LOWER(nome) = LOWER(?) AND ativo = 1",
+    )
     .get(nome);
   if (!usuario)
     return res.status(401).json({ erro: "Nome ou senha incorretos" });
@@ -245,6 +255,8 @@ app.post(
     const { nome, senha, pode_vender, pode_producao, pode_gestao } = req.body;
     if (!nome || !senha)
       return res.status(400).json({ erro: "Nome e senha obrigatórios" });
+    const erroSenha = validarSenha(senha);
+    if (erroSenha) return res.status(400).json({ erro: erroSenha });
     const existe = db
       .prepare("SELECT id FROM usuarios WHERE nome = ?")
       .get(nome);
@@ -278,34 +290,61 @@ app.patch(
   exigir("pode_gestao"),
   async (req, res) => {
     const { senha, pode_vender, pode_producao, pode_gestao, ativo } = req.body;
-    if (senha) {
-      const hash = await bcrypt.hash(senha, 10);
-      db.prepare("UPDATE usuarios SET senha_hash = ? WHERE id = ?").run(
-        hash,
-        req.params.id,
-      );
+    const { id } = req.params;
+
+    try {
+      // --- VALIDAÇÃO E ATUALIZAÇÃO DA SENHA ---
+      if (senha) {
+        // Chama a função de validação antes de qualquer processamento pesado
+        const erroSenha = validarSenha(senha);
+        if (erroSenha) {
+          return res.status(400).json({ erro: erroSenha });
+        }
+
+        // Gera o hash apenas se a senha for válida
+        const hash = await bcrypt.hash(senha, 10);
+        db.prepare("UPDATE usuarios SET senha_hash = ? WHERE id = ?").run(
+          hash,
+          id,
+        );
+      }
+
+      // --- ATUALIZAÇÃO DAS PERMISSÕES E STATUS ---
+      // Usamos '!== undefined' para permitir valores booleanos (false/0)
+      if (pode_vender !== undefined) {
+        db.prepare("UPDATE usuarios SET pode_vender = ? WHERE id = ?").run(
+          pode_vender ? 1 : 0,
+          id,
+        );
+      }
+
+      if (pode_producao !== undefined) {
+        db.prepare("UPDATE usuarios SET pode_producao = ? WHERE id = ?").run(
+          pode_producao ? 1 : 0,
+          id,
+        );
+      }
+
+      if (pode_gestao !== undefined) {
+        db.prepare("UPDATE usuarios SET pode_gestao = ? WHERE id = ?").run(
+          pode_gestao ? 1 : 0,
+          id,
+        );
+      }
+
+      if (ativo !== undefined) {
+        db.prepare("UPDATE usuarios SET ativo = ? WHERE id = ?").run(
+          ativo ? 1 : 0,
+          id,
+        );
+      }
+
+      // Retorna sucesso se chegar até aqui
+      res.json({ ok: true, mensagem: "Usuário atualizado com sucesso" });
+    } catch (error) {
+      console.error("Erro ao atualizar usuário:", error);
+      res.status(500).json({ erro: "Erro interno ao atualizar usuário" });
     }
-    if (pode_vender !== undefined)
-      db.prepare("UPDATE usuarios SET pode_vender = ? WHERE id = ?").run(
-        pode_vender ? 1 : 0,
-        req.params.id,
-      );
-    if (pode_producao !== undefined)
-      db.prepare("UPDATE usuarios SET pode_producao = ? WHERE id = ?").run(
-        pode_producao ? 1 : 0,
-        req.params.id,
-      );
-    if (pode_gestao !== undefined)
-      db.prepare("UPDATE usuarios SET pode_gestao = ? WHERE id = ?").run(
-        pode_gestao ? 1 : 0,
-        req.params.id,
-      );
-    if (ativo !== undefined)
-      db.prepare("UPDATE usuarios SET ativo = ? WHERE id = ?").run(
-        ativo ? 1 : 0,
-        req.params.id,
-      );
-    res.json({ ok: true });
   },
 );
 
