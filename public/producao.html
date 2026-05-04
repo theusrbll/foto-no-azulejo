@@ -57,8 +57,6 @@
       .btn-pronto:hover { background: #25a244; }
       .btn-acao:disabled { background: #ccc; cursor: not-allowed; }
 
-      .hora-finalizacao { font-size: 11px; color: #aaa; text-align: center; margin-top: 6px; }
-
       .coluna-vazia { text-align: center; padding: 40px 20px; color: #bbb; font-size: 13px; }
 
       @media (max-width: 700px) {
@@ -109,7 +107,6 @@
     </div>
 
     <script>
-      let pedidos = {}
       let timers = {}
       let somAtivo = false
       let audioCtx = null
@@ -152,7 +149,7 @@
 
           const todosIds = [...data.novos, ...data.emProducao, ...data.prontos].map(p => p.id)
 
-          // detecta novos
+          // detecta novos pedidos para tocar som
           let temNovo = false
           data.novos.forEach(p => {
             if (!idsAnteriores.has(p.id) && idsAnteriores.size > 0) temNovo = true
@@ -160,7 +157,7 @@
           if (temNovo) tocarSom()
           idsAnteriores = new Set(todosIds)
 
-          // para timers de pedidos que saíram
+          // para timers de pedidos que saíram de todas as colunas
           Object.keys(timers).forEach(id => {
             if (!todosIds.includes(id)) {
               clearInterval(timers[id])
@@ -189,16 +186,29 @@
           return
         }
 
-        // mantém cards existentes, adiciona novos, remove ausentes
+        // remove vazio se existir
+        const vazio = col.querySelector('.coluna-vazia')
+        if (vazio) vazio.remove()
+
+        // ids que devem estar nessa coluna agora
         const idsNovos = new Set(lista.map(p => p.id))
+
+        // remove cards que não pertencem mais a essa coluna
         col.querySelectorAll('.card[data-id]').forEach(el => {
-          if (!idsNovos.has(el.dataset.id)) el.remove()
+          if (!idsNovos.has(el.dataset.id)) {
+            clearInterval(timers[el.dataset.id])
+            delete timers[el.dataset.id]
+            el.remove()
+          }
         })
 
+        // adiciona novos cards
         lista.forEach(p => {
           if (!document.getElementById('card-' + p.id)) {
             col.appendChild(criarCard(p, tipo))
-            if (tipo !== 'pronto') iniciarTimer(p.id, new Date(p.criado_em + 'Z'))
+            if (tipo !== 'pronto') {
+              iniciarTimer(p.id, new Date(p.criado_em))
+            }
           }
         })
 
@@ -215,14 +225,15 @@
         div.id = 'card-' + p.id
         div.dataset.id = p.id
 
-        const criado = new Date(p.criado_em + 'Z')
-        const finalizado = p.atualizado_em ? new Date(p.atualizado_em + 'Z') : null
+        const finalizado = p.atualizado_em ? new Date(p.atualizado_em) : null
 
         let timerHtml = ''
         if (tipo === 'novo' || tipo === 'producao') {
           timerHtml = `<span class="timer ok" id="timer-${p.id}">10:00</span>`
         } else {
-          const hora = finalizado ? finalizado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : ''
+          const hora = finalizado
+            ? finalizado.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+            : ''
           timerHtml = `<span class="timer pausado">Pronto às ${hora}</span>`
         }
 
@@ -259,14 +270,26 @@
       }
 
       function iniciarTimer(id, criado) {
-        if (timers[id]) return
+        // cancela timer anterior se existir
+        if (timers[id]) {
+          clearInterval(timers[id])
+          delete timers[id]
+        }
+
         const LIMITE = 10 * 60 * 1000
+
         function atualizar() {
           const el = document.getElementById('timer-' + id)
           const card = document.getElementById('card-' + id)
-          if (!el || !card) return
+          if (!el || !card) {
+            clearInterval(timers[id])
+            delete timers[id]
+            return
+          }
+
           const decorrido = Date.now() - criado.getTime()
           const restante = LIMITE - decorrido
+
           if (restante <= 0) {
             el.textContent = '00:00'
             el.className = 'timer urgente'
@@ -274,20 +297,25 @@
             card.classList.remove('quase')
             return
           }
+
           const min = Math.floor(restante / 60000)
           const seg = Math.floor((restante % 60000) / 1000)
           el.textContent = String(min).padStart(2, '0') + ':' + String(seg).padStart(2, '0')
+
           if (restante < 2 * 60 * 1000) {
             el.className = 'timer urgente'
-            card.classList.add('urgente'); card.classList.remove('quase')
+            card.classList.add('urgente')
+            card.classList.remove('quase')
           } else if (restante < 4 * 60 * 1000) {
             el.className = 'timer quase'
-            card.classList.add('quase'); card.classList.remove('urgente')
+            card.classList.add('quase')
+            card.classList.remove('urgente')
           } else {
             el.className = 'timer ok'
             card.classList.remove('urgente', 'quase')
           }
         }
+
         atualizar()
         timers[id] = setInterval(atualizar, 1000)
       }
@@ -303,7 +331,10 @@
           })
           await carregarPedidos()
         } catch (e) {
-          if (btn) { btn.disabled = false; btn.textContent = btn.classList.contains('btn-iniciar') ? 'Iniciar produção' : 'Marcar como pronto' }
+          if (btn) {
+            btn.disabled = false
+            btn.textContent = btn.classList.contains('btn-iniciar') ? 'Iniciar produção' : 'Marcar como pronto'
+          }
           alert('Erro ao atualizar. Tente novamente.')
         }
       }
