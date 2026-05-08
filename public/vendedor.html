@@ -3,87 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Selarón — Vendedor</title>
+    <title>Foto na Cerâmica — Vendas</title>
+    <link rel="stylesheet" href="/css/global.css" />
+    <link rel="stylesheet" href="/css/vendedor.css" />
     <script src="/auth.js"></script>
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { font-family: system-ui, sans-serif; background: #f5f5f5; min-height: 100vh; }
-
-      .topo { background: #1a1a2e; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-      .topo h1 { font-size: 18px; font-weight: 600; }
-      .topo-direita { display: flex; align-items: center; gap: 10px; }
-      .topo span { font-size: 13px; opacity: 0.7; }
-      .btn-sair-topo { background: none; border: 1.5px solid rgba(255,255,255,0.3); color: white; border-radius: 8px; padding: 5px 12px; font-size: 12px; cursor: pointer; }
-      .btn-sair-topo:hover { background: rgba(255,255,255,0.1); }
-
-      .conteudo { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
-
-      .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-      .card h2 { font-size: 15px; color: #444; margin-bottom: 14px; }
-
-      .foto-area { border: 2px dashed #ccc; border-radius: 10px; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: border-color 0.2s; }
-      .foto-area img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; border-radius: 8px; }
-      .placeholder { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #999; font-size: 14px; z-index: 1; }
-
-      .ponto-selector { display: flex; gap: 10px; }
-      .ponto-btn { flex: 1; border: 2px solid #e0e0e0; border-radius: 10px; padding: 12px 8px; text-align: center; cursor: pointer; background: white; font-size: 14px; font-weight: 600; color: #555; transition: all 0.15s; }
-      .ponto-btn:hover { border-color: #e63946; }
-      .ponto-btn.selecionado { border-color: #e63946; background: #fff5f5; color: #e63946; }
-
-      .produto-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
-      .produto-item:last-child { border-bottom: none; }
-      .produto-info { flex: 1; }
-      .produto-nome { font-size: 14px; font-weight: 500; color: #1a1a2e; }
-      .produto-preco { font-size: 13px; color: #888; margin-top: 2px; }
-      .quantidade-ctrl { display: flex; align-items: center; gap: 10px; }
-      .qty-btn { width: 32px; height: 32px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #444; transition: all 0.15s; line-height: 1; }
-      .qty-btn:hover { border-color: #e63946; color: #e63946; }
-      .qty-num { font-size: 16px; font-weight: 600; color: #1a1a2e; min-width: 20px; text-align: center; }
-
-      .carrinho-resumo { background: #f8f8f8; border-radius: 10px; padding: 14px; margin-top: 4px; }
-      .carrinho-linha { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 6px; }
-      .carrinho-linha:last-child { margin-bottom: 0; font-weight: 600; color: #1a1a2e; font-size: 15px; border-top: 1px solid #e0e0e0; padding-top: 8px; margin-top: 4px; }
-
-      label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
-      input[type="text"] { width: 100%; border: 1.5px solid #e0e0e0; border-radius: 8px; padding: 10px 12px; font-size: 15px; outline: none; transition: border-color 0.2s; }
-      input[type="text"]:focus { border-color: #e63946; }
-
-      .btn-enviar { width: 100%; background: #e63946; color: white; border: none; border-radius: 10px; padding: 16px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-bottom: 16px; }
-      .btn-enviar:hover { background: #c1121f; }
-      .btn-enviar:disabled { background: #ccc; cursor: not-allowed; }
-
-      .tela-sucesso { text-align: center; padding: 24px 20px; }
-      .tela-sucesso h2 { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 16px; }
-
-      .pedido-card { background: #f8f8f8; border-radius: 10px; padding: 14px; margin-bottom: 10px; text-align: left; }
-      .pedido-card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-      .pedido-numero { font-size: 22px; font-weight: 700; color: #e63946; letter-spacing: 3px; }
-      .pedido-produto { font-size: 13px; color: #666; }
-      .pedido-qr { width: 120px; height: 120px; border-radius: 8px; }
-
-      .btn-novo { width: 100%; margin-top: 16px; background: #1a1a2e; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 15px; cursor: pointer; }
-
-      .vazio-produtos { text-align: center; padding: 20px; color: #aaa; font-size: 14px; }
-    </style>
   </head>
   <body>
     <div id="app-vendedor">
       <div class="topo">
-        <h1>Selarón Azulejos</h1>
+        <div class="logo-wrap">
+          <div class="logo-icon">
+            <svg width="20" height="20" viewBox="0 0 28 28" fill="none">
+              <rect x="3" y="8" width="22" height="16" rx="3" fill="#1C1C1C" />
+              <circle cx="14" cy="16" r="5" fill="#E8C547" />
+              <circle cx="14" cy="16" r="3" fill="#1C1C1C" opacity="0.5" />
+              <rect x="10" y="5" width="8" height="4" rx="1.5" fill="#1C1C1C" />
+            </svg>
+          </div>
+          <div>
+            <div class="logo-nome">Foto na Cerâmica</div>
+            <div class="logo-sub" id="info-vendedor"></div>
+          </div>
+        </div>
         <div class="topo-direita">
-          <span id="info-vendedor"></span>
-          <button class="btn-sair-topo" onclick="voltarMenu()">Menu</button>
-          <button class="btn-sair-topo" onclick="sair()">Sair</button>
+          <button class="btn-ghost" onclick="voltarMenu()">Menu</button>
+          <button class="btn-ghost" onclick="sair()">Sair</button>
         </div>
       </div>
 
-      <div class="conteudo">
+      <div class="vendedor-conteudo">
         <!-- TELA DO PEDIDO -->
         <div id="tela-pedido">
           <div class="card">
             <h2>Foto do cliente</h2>
-            <div class="foto-area" id="foto-area">
-              <div class="placeholder" id="placeholder">
+            <div class="foto-area">
+              <div class="foto-placeholder" id="foto-placeholder">
                 <svg
                   width="40"
                   height="40"
@@ -97,17 +51,11 @@
                   />
                   <circle cx="12" cy="13" r="4" />
                 </svg>
-                <div style="display:flex; gap:10px; margin-top:8px;">
-                  <button
-                    onclick="event.stopPropagation(); abrirCamera()"
-                    style="background:#e63946; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;"
-                  >
+                <div class="foto-acoes">
+                  <button class="btn btn-primary" onclick="abrirCamera()">
                     Câmera
                   </button>
-                  <button
-                    onclick="event.stopPropagation(); abrirGaleria()"
-                    style="background:#1a1a2e; color:white; border:none; border-radius:8px; padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;"
-                  >
+                  <button class="btn btn-dark" onclick="abrirGaleria()">
                     Galeria
                   </button>
                 </div>
@@ -158,23 +106,29 @@
             </div>
             <div
               id="carrinho-resumo"
-              style="display:none"
               class="carrinho-resumo"
+              style="display:none"
             >
               <div id="carrinho-linhas"></div>
             </div>
           </div>
 
           <div class="card">
-            <label>Nome do cliente (opcional)</label>
+            <label class="input-label">Nome do cliente (opcional)</label>
             <input
+              class="input"
               type="text"
               id="nome-cliente"
               placeholder="Ex: Maria, turista alemã..."
             />
           </div>
 
-          <button class="btn-enviar" id="btn-enviar" onclick="enviarPedido()">
+          <button
+            class="btn btn-primary btn-full"
+            id="btn-enviar"
+            onclick="enviarPedido()"
+            style="margin-bottom:16px; padding:16px;"
+          >
             Enviar pedido para produção
           </button>
         </div>
@@ -184,198 +138,18 @@
         <div id="tela-sucesso" class="card tela-sucesso" style="display:none">
           <h2>Pedidos enviados!</h2>
           <div id="lista-pedidos-criados"></div>
-          <button class="btn-novo" onclick="novoPedido()">Nova venda</button>
+          <button
+            class="btn btn-dark btn-full"
+            onclick="novoPedido()"
+            style="margin-top:16px;"
+          >
+            Nova venda
+          </button>
         </div>
         <!-- FIM TELA DE SUCESSO -->
       </div>
     </div>
 
-    <script>
-      let usuario = null
-      let fotoSelecionada = null
-      let pontoSelecionado = 'cima'
-      let produtos = []
-      let carrinho = {}
-
-      usuario = getUsuario()
-      if (!usuario || !usuario.pode_vender) {
-        window.location.href = '/login.html'
-      } else {
-        document.getElementById('info-vendedor').textContent = usuario.nome
-        carregarProdutos()
-      }
-
-      async function carregarProdutos() {
-        try {
-          const res = await fetchAuth('/api/produtos')
-          produtos = await res.json()
-          renderProdutos()
-        } catch (e) {
-          document.getElementById('lista-produtos').innerHTML = '<div class="vazio-produtos">Erro ao carregar produtos</div>'
-        }
-      }
-
-      function renderProdutos() {
-        const lista = document.getElementById('lista-produtos')
-        if (produtos.length === 0) {
-          lista.innerHTML = '<div class="vazio-produtos">Nenhum produto cadastrado</div>'
-          return
-        }
-        lista.innerHTML = produtos.map(p => `
-          <div class="produto-item">
-            <div class="produto-info">
-              <div class="produto-nome">${p.nome}</div>
-              <div class="produto-preco">R$ ${parseFloat(p.preco).toFixed(2)}</div>
-            </div>
-            <div class="quantidade-ctrl">
-              <button class="qty-btn" onclick="alterarQtd('${p.id}', -1)">−</button>
-              <span class="qty-num" id="qty-${p.id}">0</span>
-              <button class="qty-btn" onclick="alterarQtd('${p.id}', 1)">+</button>
-            </div>
-          </div>
-        `).join('')
-      }
-
-      function alterarQtd(id, delta) {
-        const atual = carrinho[id] || 0
-        const novo = Math.max(0, atual + delta)
-        if (novo === 0) delete carrinho[id]
-        else carrinho[id] = novo
-        document.getElementById('qty-' + id).textContent = novo
-        atualizarResumo()
-      }
-
-      function atualizarResumo() {
-        const ids = Object.keys(carrinho)
-        const resumoEl = document.getElementById('carrinho-resumo')
-        const linhasEl = document.getElementById('carrinho-linhas')
-
-        if (ids.length === 0) {
-          resumoEl.style.display = 'none'
-          return
-        }
-
-        let total = 0
-        let totalItens = 0
-        let html = ''
-
-        ids.forEach(id => {
-          const prod = produtos.find(p => p.id === id)
-          if (!prod) return
-          const subtotal = prod.preco * carrinho[id]
-          total += subtotal
-          totalItens += carrinho[id]
-          html += `<div class="carrinho-linha"><span>${prod.nome} × ${carrinho[id]}</span><span>R$ ${subtotal.toFixed(2)}</span></div>`
-        })
-
-        html += `<div class="carrinho-linha"><span>${totalItens} item(s)</span><span>R$ ${total.toFixed(2)}</span></div>`
-        linhasEl.innerHTML = html
-        resumoEl.style.display = 'block'
-      }
-
-      function selecionarPonto(ponto) {
-        pontoSelecionado = ponto
-        document.getElementById('ponto-cima').classList.toggle('selecionado', ponto === 'cima')
-        document.getElementById('ponto-baixo').classList.toggle('selecionado', ponto === 'baixo')
-      }
-
-      function abrirCamera() { document.getElementById('input-camera').click() }
-      function abrirGaleria() { document.getElementById('input-galeria').click() }
-
-      function mostrarPreview(input) {
-        if (!input.files[0]) return
-        fotoSelecionada = input.files[0]
-        const url = URL.createObjectURL(fotoSelecionada)
-        const img = document.getElementById('preview-foto')
-        img.src = url
-        img.style.display = 'block'
-        document.getElementById('placeholder').style.display = 'none'
-      }
-
-      async function enviarPedido() {
-        if (!fotoSelecionada) return alert('Tire uma foto primeiro')
-        const itensCarrinho = Object.keys(carrinho)
-        if (itensCarrinho.length === 0) return alert('Adicione pelo menos um produto')
-
-        const btn = document.getElementById('btn-enviar')
-        btn.disabled = true
-        btn.textContent = 'Enviando...'
-
-        const itens = itensCarrinho.map(id => {
-          const prod = produtos.find(p => p.id === id)
-          return { id, nome: prod.nome, preco: prod.preco, quantidade: carrinho[id] }
-        })
-
-        const form = new FormData()
-        form.append('foto', fotoSelecionada)
-        form.append('ponto_venda', pontoSelecionado)
-        form.append('nome_cliente', document.getElementById('nome-cliente').value)
-        form.append('itens', JSON.stringify(itens))
-
-        try {
-          const token = getToken()
-          const res = await fetch('/api/pedidos/lote', {
-            method: 'POST',
-            headers: { 'Authorization': 'Bearer ' + token },
-            body: form
-          })
-
-          if (res.status === 401) { sair(); return }
-
-          if (!res.ok) {
-            const erro = await res.json()
-            alert('Erro: ' + (erro.erro || 'Tente novamente'))
-            btn.disabled = false
-            btn.textContent = 'Enviar pedido para produção'
-            return
-          }
-
-          const data = await res.json()
-          mostrarSucesso(data.pedidos)
-
-        } catch (e) {
-          console.error(e)
-          alert('Erro ao enviar pedido. Verifique a conexão.')
-          btn.disabled = false
-          btn.textContent = 'Enviar pedido para produção'
-        }
-      }
-
-      function mostrarSucesso(pedidos) {
-        const lista = document.getElementById('lista-pedidos-criados')
-        lista.innerHTML = pedidos.map(p => `
-          <div class="pedido-card">
-            <div class="pedido-card-topo">
-              <div>
-                <div class="pedido-numero">${p.numero}</div>
-                <div class="pedido-produto">${p.produto}</div>
-              </div>
-              <img class="pedido-qr" src="${p.qrCode}" alt="QR Code">
-            </div>
-          </div>
-        `).join('')
-        document.getElementById('tela-pedido').style.display = 'none'
-        document.getElementById('tela-sucesso').style.display = 'block'
-      }
-
-      function novoPedido() {
-        fotoSelecionada = null
-        carrinho = {}
-        pontoSelecionado = 'cima'
-        document.getElementById('preview-foto').style.display = 'none'
-        document.getElementById('preview-foto').src = ''
-        document.getElementById('placeholder').style.display = 'flex'
-        document.getElementById('input-camera').value = ''
-        document.getElementById('input-galeria').value = ''
-        document.getElementById('nome-cliente').value = ''
-        document.getElementById('carrinho-resumo').style.display = 'none'
-        selecionarPonto('cima')
-        renderProdutos()
-        document.getElementById('tela-sucesso').style.display = 'none'
-        document.getElementById('tela-pedido').style.display = 'block'
-        document.getElementById('btn-enviar').disabled = false
-        document.getElementById('btn-enviar').textContent = 'Enviar pedido para produção'
-      }
-    </script>
+    <script src="/js/vendedor.js"></script>
   </body>
 </html>

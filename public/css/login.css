@@ -1,0 +1,137 @@
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-wrap {
+  width: 100%;
+  max-width: 380px;
+}
+
+/* LOGO */
+.login-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.login-logo-icon {
+  width: 64px;
+  height: 64px;
+  background: var(--ambar);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+.login-logo-nome {
+  font-family: var(--fonte-display);
+  font-size: 24px;
+  color: var(--escuro);
+  line-height: 1.1;
+}
+.login-logo-sub {
+  font-size: 13px;
+  color: var(--cinza);
+  margin-top: 4px;
+}
+
+/* CARD DO FORMULÁRIO */
+.login-card {
+  background: var(--branco);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  box-shadow: var(--sombra);
+  margin-bottom: 12px;
+}
+
+.login-campo {
+  margin-bottom: 14px;
+}
+
+.erro-msg {
+  background: #fdecea;
+  border: 1px solid #f5c6c2;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--vermelho);
+  margin-top: 12px;
+  display: none;
+  text-align: center;
+}
+
+.login-rodape {
+  text-align: center;
+  font-size: 11px;
+  color: var(--borda);
+  margin-top: 16px;
+  letter-spacing: 0.5px;
+}
+
+/* MENU DE MÓDULOS */
+.menu-saudacao {
+  font-size: 13px;
+  color: var(--cinza);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.menu-saudacao strong {
+  color: var(--escuro);
+  font-weight: 600;
+}
+
+.opcao {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1.5px solid var(--borda);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  color: inherit;
+  background: var(--branco);
+}
+.opcao:hover {
+  border-color: var(--verde);
+  background: var(--verde-claro);
+}
+.opcao:hover .opcao-titulo {
+  color: var(--verde);
+}
+
+.opcao-icone {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.opcao-icone.vendas {
+  background: #e3f0ff;
+}
+.opcao-icone.producao {
+  background: #fff3e0;
+}
+.opcao-icone.gestao {
+  background: var(--verde-claro);
+}
+
+.opcao-titulo {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--escuro);
+  transition: color 0.15s;
+}
+.opcao-desc {
+  font-size: 12px;
+  color: var(--cinza);
+  margin-top: 2px;
+}

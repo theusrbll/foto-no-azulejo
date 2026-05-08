@@ -15,9 +15,9 @@ app.use("/api/auth", require("./routes/auth"));
 app.use("/api/usuarios", require("./routes/usuarios"));
 app.use("/api/produtos", require("./routes/produtos"));
 app.use("/api/pedidos", require("./routes/pedidos"));
-app.use("/api/rastrear", require("./routes/pedidos"));
-app.use("/api/foto", require("./routes/pedidos"));
-app.use("/api/gestao", require("./routes/pedidos"));
+app.use("/api/gestao", require("./routes/gestao"));
+app.use("/api/rastrear", require("./routes/rastrear"));
+app.use("/api/foto", require("./routes/rastrear"));
 
 app.get("/", (req, res) => res.redirect("/login.html"));
 

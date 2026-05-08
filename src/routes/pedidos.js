@@ -6,7 +6,7 @@ const fs = require("fs");
 const { v4: uuidv4 } = require("uuid");
 const QRCode = require("qrcode");
 const { db, pedidos } = require("../db");
-const { eq, sql, and } = require("drizzle-orm");
+const { eq, sql } = require("drizzle-orm");
 const { autenticar, exigir } = require("../middleware/auth");
 
 const router = express.Router();
@@ -36,13 +36,10 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
-    if (TIPOS_PERMITIDOS.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Tipo de arquivo não permitido. Envie apenas imagens."));
-    }
+    if (TIPOS_PERMITIDOS.includes(file.mimetype)) cb(null, true);
+    else cb(new Error("Tipo de arquivo não permitido. Envie apenas imagens."));
   },
-  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
+  limits: { fileSize: 15 * 1024 * 1024 },
 });
 
 function gerarNumero() {
@@ -80,6 +77,9 @@ router.post(
     const { ponto_venda, nome_cliente } = req.body;
     const pedidosCriados = [];
 
+    // usa BASE_URL do .env para o QR code funcionar no celular
+    const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
+
     for (const item of itens) {
       for (let q = 0; q < item.quantidade; q++) {
         const id = uuidv4();
@@ -91,7 +91,6 @@ router.post(
           numero = gerarNumero();
         }
 
-        const baseUrl = `http://${req.hostname}:${PORT}`;
         const urlRastreio = `${baseUrl}/rastrear.html?pedido=${numero}`;
         const qrDataUrl = await QRCode.toDataURL(urlRastreio, {
           width: 300,
@@ -168,6 +167,7 @@ router.patch("/:id/status", autenticar, exigir("pode_producao"), (req, res) => {
   const statusValidos = ["aguardando", "em_producao", "pronto"];
   if (!statusValidos.includes(status))
     return res.status(400).json({ erro: "Status inválido" });
+
   db.update(pedidos)
     .set({
       status,
@@ -175,116 +175,9 @@ router.patch("/:id/status", autenticar, exigir("pode_producao"), (req, res) => {
     })
     .where(eq(pedidos.id, req.params.id))
     .run();
+
   res.json({ ok: true });
 });
-
-// RASTREAR (público)
-router.get("/rastrear/:numero", (req, res) => {
-  const resultado = db
-    .select({
-      numero: pedidos.numero,
-      tamanho: pedidos.tamanho,
-      status: pedidos.status,
-      foto: pedidos.foto,
-      criado_em: pedidos.criado_em,
-    })
-    .from(pedidos)
-    .where(sql`UPPER(${pedidos.numero}) = UPPER(${req.params.numero})`)
-    .all();
-
-  if (resultado.length === 0)
-    return res.status(404).json({ erro: "Pedido não encontrado" });
-  res.json(resultado[0]);
-});
-
-// FOTO (público)
-router.get("/foto/:numero", (req, res) => {
-  const resultado = db
-    .select({ foto: pedidos.foto })
-    .from(pedidos)
-    .where(sql`UPPER(${pedidos.numero}) = UPPER(${req.params.numero})`)
-    .all();
-
-  if (resultado.length === 0)
-    return res.status(404).json({ erro: "Pedido não encontrado" });
-
-  const caminho = path.join(
-    __dirname,
-    "..",
-    "..",
-    "uploads",
-    resultado[0].foto,
-  );
-  if (!fs.existsSync(caminho))
-    return res.status(404).json({ erro: "Foto não disponível" });
-  res.download(caminho, `selaron-${req.params.numero}.jpg`);
-});
-
-// GESTÃO — RESUMO
-router.get("/gestao/resumo", autenticar, exigir("pode_gestao"), (req, res) => {
-  const data = req.query.data || new Date().toISOString().slice(0, 10);
-  const hoje = new Date().toISOString().slice(0, 10);
-
-  const totalDia = db
-    .select({
-      total: sql`COUNT(*)`,
-      faturamento: sql`SUM(${pedidos.preco})`,
-    })
-    .from(pedidos)
-    .where(sql`DATE(${pedidos.criado_em}) = ${data}`)
-    .all()[0];
-
-  const porVendedor = db
-    .select({
-      vendedor: pedidos.vendedor_nome,
-      total: sql`COUNT(*)`,
-      faturamento: sql`SUM(${pedidos.preco})`,
-    })
-    .from(pedidos)
-    .where(sql`DATE(${pedidos.criado_em}) = ${data}`)
-    .groupBy(pedidos.vendedor_nome)
-    .orderBy(sql`COUNT(*) DESC`)
-    .all();
-
-  const porPonto = db
-    .select({
-      ponto_venda: pedidos.ponto_venda,
-      total: sql`COUNT(*)`,
-    })
-    .from(pedidos)
-    .where(sql`DATE(${pedidos.criado_em}) = ${data}`)
-    .groupBy(pedidos.ponto_venda)
-    .all();
-
-  const atrasados = db
-    .select({
-      total: sql`COUNT(*)`,
-    })
-    .from(pedidos)
-    .where(
-      sql`${pedidos.status} = 'aguardando' AND DATE(${pedidos.criado_em}) = ${hoje} AND (JULIANDAY('now') - JULIANDAY(${pedidos.criado_em})) * 1440 > 10`,
-    )
-    .all()[0];
-
-  res.json({ totalDia, porVendedor, porPonto, atrasados });
-});
-
-// GESTÃO — HISTÓRICO
-router.get(
-  "/gestao/historico",
-  autenticar,
-  exigir("pode_gestao"),
-  (req, res) => {
-    const data = req.query.data || new Date().toISOString().slice(0, 10);
-    const lista = db
-      .select()
-      .from(pedidos)
-      .where(sql`DATE(${pedidos.criado_em}) = ${data}`)
-      .orderBy(sql`${pedidos.criado_em} DESC`)
-      .all();
-    res.json(lista);
-  },
-);
 
 // LIMPEZA DE UPLOADS ANTIGOS
 function limparUploadsAntigos() {
